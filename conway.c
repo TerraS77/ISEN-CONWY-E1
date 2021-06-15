@@ -8,7 +8,7 @@
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
 #define LargeurFenetre 800
 #define HauteurFenetre 600
-#define MATRIX_H 1000
+#define MATRIX_H 500
 #define MATRIX_W 1000
 
 void gestionEvenement(EvenementGfx evenement);
@@ -31,7 +31,12 @@ void gestionEvenement(EvenementGfx evenement)
 	static int CellDataCache[MATRIX_H][MATRIX_W]; //Cache de la matrice (utilisé pour t+1 à partir de t)
 	static int CellSize = 10; //Taille d'une cellule en pixel
 	static int CellInBetween = 1; //Taille de l'espace inter cellules  en pixel
+	static int DeltaX = 0;
+	static int DeltaY = 0;
 	static bool pause = true;
+	static bool RCD = false;
+	static int XDRC = 0;
+	static int YDRC = 0;
 	switch (evenement)
 	{
 		case Initialisation:
@@ -41,7 +46,7 @@ void gestionEvenement(EvenementGfx evenement)
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			//Lancement de la routine
-			demandeTemporisation(100);
+			demandeTemporisation(60);
         break;
 
 		case Temporisation: ;
@@ -52,10 +57,10 @@ void gestionEvenement(EvenementGfx evenement)
 			if(HcellCap > MATRIX_H || WcellCap > MATRIX_W) printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > MATRIX_H ? "Y" : "X");
 			//Calcul et application de t+1 (Si la pause n'est pas active)
 			if(!pause){
-				for(int x = 0; x<WcellCap; x++){
-					for(int y = 0; y<HcellCap; y++){
+				for(int x = 0; x<MATRIX_W; x++){
+					for(int y = 0; y<MATRIX_H; y++){
 						//Récupération de voisins
-						int AN = getAliveNeyboors(CellData, x, y, WcellCap, HcellCap);
+						int AN = getAliveNeyboors(CellData, x, y, MATRIX_W, MATRIX_H);
 						//Calcul de l'état à t+1 pour chaque cellules et stockage dans le cache 
 						if(CellData[y][x] == 1){
 							if(AN >= 2 && AN <= 3){
@@ -79,36 +84,69 @@ void gestionEvenement(EvenementGfx evenement)
 			//x,y les coordonnées dans la matrices
 			//LBCx, LBCy les coordonnées du point infèrieur gauche du carré dans la fenêtre
 			//RTCx, RTCy les coordonnées du point supèrieur droit du carré dans la fenêtre
-			for(int y = 0; y < HcellCap; y++){
-				for(int x = 0; x < WcellCap; x++){
-					int LBCx = x*(CellSize + CellInBetween)+CellInBetween;
-					int LBCy = (y+1)*(CellSize + CellInBetween);
-					int RTCx = (x+1)*(CellSize + CellInBetween);
-					int RTCy = y*(CellSize + CellInBetween)+CellInBetween;
-					CellData[y][x] == 0 ? couleurCourante(0,0,0) : couleurCourante(255, 255, 255);
-					rectangle(LBCx,LBCy,RTCx,RTCy);
+			for (int y = DeltaY; y < (HcellCap + 1 + DeltaY); y++){
+				for (int x = DeltaX; x < (WcellCap + 1 + DeltaX); x++){
+					int LBCx = x * (CellSize + CellInBetween) + CellInBetween - (DeltaX * (CellSize + CellInBetween));
+					int LBCy = (y + 1) * (CellSize + CellInBetween) - (DeltaY * (CellSize + CellInBetween));
+					int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
+					int RTCy = y * (CellSize + CellInBetween) + CellInBetween - (DeltaY * (CellSize + CellInBetween));
+					CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(255, 255, 255);
+					rectangle(LBCx, LBCy, RTCx, RTCy);
 				}
 			}
-		break;
+			break;
 
-		case BoutonSouris:
+		case BoutonSouris:;
+			float fx = abscisseSouris() / (CellSize + CellInBetween);
+			float fy = ordonneeSouris() / (CellSize + CellInBetween);
 			if (etatBoutonSouris() == GaucheAppuye){
 				//Indentification de la ceullule cible
-				float fx = abscisseSouris() / (CellSize + CellInBetween);
-				float fy = ordonneeSouris() / (CellSize + CellInBetween);
-				int Sx = floorf(fx);
-				int Sy = floorf(fy);
+				int Sx = floorf(fx) + DeltaX;
+				int Sy = floorf(fy) + DeltaY;
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
-				if((Sx < MATRIX_W) && (Sy < MATRIX_H)){
-					if(((Sx) < MATRIX_W) && ((Sy) < MATRIX_H) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
-				}
+				if ((Sx < MATRIX_W) && (Sy < MATRIX_H))
+					if (((Sx) < MATRIX_W) && ((Sy) < MATRIX_H) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
 			}
 			//AddOn Zoom sur la grille
-			if(etatBoutonSouris() == ScrollUp && CellSize < 50) CellSize += 5;
-			if(etatBoutonSouris() == ScrollDown && CellSize > 5)  CellSize -= 5;
+			bool NeedScrollUpdate = false;
+			if (etatBoutonSouris() == ScrollUp && CellSize < 50){
+				CellSize *= 1.5;
+				NeedScrollUpdate = true;
+			}
+			if (etatBoutonSouris() == ScrollDown && CellSize > 5){
+CellSize *= 0.5;	
+				NeedScrollUpdate = true;
+			}
+
+			if(etatBoutonSouris() == DroiteAppuye){
+				XDRC = abscisseSouris();
+				YDRC = ordonneeSouris();
+				RCD = true;
+			}
+			
+			if(etatBoutonSouris() == DroiteRelache){
+				RCD = false;
+			}
+
+			if(NeedScrollUpdate){
+				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+				WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+				DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
+				DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
+				if(DeltaX < 0) DeltaX = 0;
+				if(DeltaX + WcellCap >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
+				if(DeltaY < 0) DeltaY = 0;
+				if(DeltaY + HcellCap >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
+			}
+
+			rafraichisFenetre();
 			break;
+		case Souris:;
+			XDRC = abscisseSouris() / (CellSize + CellInBetween);
+			YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 		case Clavier:
 			//Système Start/Stop (initialement stop)
+			if(RCD) 
 			if(caractereClavier() == 32) pause = !pause;
 			break;
 		case Redimensionnement:
