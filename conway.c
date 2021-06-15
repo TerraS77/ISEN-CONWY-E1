@@ -48,10 +48,15 @@ void gestionEvenement(EvenementGfx evenement)
 			//Mise à jour de la capacité d'affichage avec la taille de fenêtre courante
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+			//Log si le nombre de cellules potentielles > cellules réelles
+			if(HcellCap > MATRIX_H || WcellCap > MATRIX_W) printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > MATRIX_H ? "Y" : "X");
+			//Calcul et application de t+1 (Si la pause n'est pas active)
 			if(!pause){
 				for(int x = 0; x<WcellCap; x++){
 					for(int y = 0; y<HcellCap; y++){
+						//Récupération de voisins
 						int AN = getAliveNeyboors(CellData, x, y, WcellCap, HcellCap);
+						//Calcul de l'état à t+1 pour chaque cellules et stockage dans le cache 
 						if(CellData[y][x] == 1){
 							if(AN >= 2 && AN <= 3){
 								CellDataCache[y][x] = 1;
@@ -62,6 +67,7 @@ void gestionEvenement(EvenementGfx evenement)
 						}
 					}
 				}
+				//Merging du cache
 				for(int x = 0; x<1000; x++) for(int y = 0; y<MATRIX_H; y++) CellData[y][x] = CellDataCache[y][x];
 			}
 			rafraichisFenetre();
@@ -69,54 +75,64 @@ void gestionEvenement(EvenementGfx evenement)
 		
 		case Affichage:
 			effaceFenetre (0, 0, 0);
+			//Affichage de la grille, avec :
+			//x,y les coordonnées dans la matrices
+			//LBCx, LBCy les coordonnées du point infèrieur gauche du carré dans la fenêtre
+			//RTCx, RTCy les coordonnées du point supèrieur droit du carré dans la fenêtre
 			for(int y = 0; y < HcellCap; y++){
 				for(int x = 0; x < WcellCap; x++){
 					int LBCx = x*(CellSize + CellInBetween)+CellInBetween;
 					int LBCy = (y+1)*(CellSize + CellInBetween);
-					int RYCx = (x+1)*(CellSize + CellInBetween);
-					int RYCy = y*(CellSize + CellInBetween)+CellInBetween;
+					int RTCx = (x+1)*(CellSize + CellInBetween);
+					int RTCy = y*(CellSize + CellInBetween)+CellInBetween;
 					CellData[y][x] == 0 ? couleurCourante(0,0,0) : couleurCourante(255, 255, 255);
-					rectangle(LBCx,LBCy,RYCx,RYCy);
+					rectangle(LBCx,LBCy,RTCx,RTCy);
 				}
 			}
 		break;
 
 		case BoutonSouris:
 			if (etatBoutonSouris() == GaucheAppuye){
+				//Indentification de la ceullule cible
 				float fx = abscisseSouris() / (CellSize + CellInBetween);
 				float fy = ordonneeSouris() / (CellSize + CellInBetween);
 				int Sx = floorf(fx);
 				int Sy = floorf(fy);
+				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
 				if((Sx < MATRIX_W) && (Sy < MATRIX_H)){
 					if(((Sx) < MATRIX_W) && ((Sy) < MATRIX_H) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
 				}
 			}
+			//AddOn Zoom sur la grille
 			if(etatBoutonSouris() == ScrollUp && CellSize < 50) CellSize += 5;
 			if(etatBoutonSouris() == ScrollDown && CellSize > 5)  CellSize -= 5;
 			break;
 		case Clavier:
+			//Système Start/Stop (initialement stop)
 			if(caractereClavier() == 32) pause = !pause;
 			break;
 		case Redimensionnement:
+			//Mise à jour de la fenêtre
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+			rafraichisFenetre();
 			break;
 	}
 }
 
+//Initialisation à 0 de la matrice
 void iniCellData(int tab[][MATRIX_W]){
 	for(int x = 0; x<MATRIX_W; x++) for(int y = 0; y<MATRIX_H; y++) tab[y][x] = 0;
 }
 
+//Calcul des voisins vivants
 int getAliveNeyboors(int tab[][MATRIX_W], int x, int y, int xmax, int ymax){
 	int AN = 0;
-	// if(tab[y][x] == 1) printf("========\n%d, %d :\n", x, y);
 	for(int ty = -1; ty < 2 ; ty++){
 		for(int tx = -1; tx < 2; tx++){
-			// if(tab[y][x] == 1) printf("> %d/%d = %d\n", x+tx, y+ty, tab[y+ty][x+tx]);
-			if((x+tx) > 0 && (x+tx) < xmax && (y+ty) > 0 && (y+ty) < ymax) if(tab[y+ty][x+tx] == 1) AN++;
+			if((x+tx) > 0 && (x+tx) < xmax && (y+ty) > 0 && (y+ty) < ymax) 
+				if(tab[y+ty][x+tx] == 1) AN++;
 		}
 	}
-	// if(tab[y][x] == 1) printf("AN : %d\n", AN-tab[y][x]);
 	return (AN-tab[y][x]);
 };
