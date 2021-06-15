@@ -109,18 +109,18 @@ void gestionEvenement(EvenementGfx evenement)
 			}
 			//AddOn Zoom sur la grille
 			bool NeedScrollUpdate = false;
-			if (etatBoutonSouris() == ScrollUp && CellSize < 50){
+			if (etatBoutonSouris() == ScrollUp && CellSize < 50 && !RCD){
 				CellSize *= 1.5;
 				NeedScrollUpdate = true;
 			}
-			if (etatBoutonSouris() == ScrollDown && CellSize > 5){
-CellSize *= 0.5;	
+			if (etatBoutonSouris() == ScrollDown && CellSize > 5 && !RCD){
+				CellSize *= 0.5;
 				NeedScrollUpdate = true;
 			}
 
 			if(etatBoutonSouris() == DroiteAppuye){
-				XDRC = abscisseSouris();
-				YDRC = ordonneeSouris();
+				XDRC = abscisseSouris() / (CellSize + CellInBetween);
+				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				RCD = true;
 			}
 			
@@ -141,12 +141,20 @@ CellSize *= 0.5;
 
 			rafraichisFenetre();
 			break;
-		case Souris:;
-			XDRC = abscisseSouris() / (CellSize + CellInBetween);
-			YDRC = ordonneeSouris() / (CellSize + CellInBetween);
+		case Souris:
+			if(RCD){
+				DeltaX += floorf(XDRC) - floorf(abscisseSouris() / (CellSize + CellInBetween));
+				DeltaY += floorf(YDRC) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
+				XDRC = abscisseSouris() / (CellSize + CellInBetween);
+				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
+				if(DeltaX < 0) DeltaX = 0;
+				if(DeltaX + WcellCap >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
+				if(DeltaY < 0) DeltaY = 0;
+				if(DeltaY + HcellCap >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
+			}
+			break;
 		case Clavier:
 			//Système Start/Stop (initialement stop)
-			if(RCD) 
 			if(caractereClavier() == 32) pause = !pause;
 			break;
 		case Redimensionnement:
