@@ -9,8 +9,6 @@
 
 #define CURSOR_R 10
 
-//INITIALISATIONS ELEMENTS
-
 coord2D new2Dcoord(int x, int y){
     coord2D new;
     new.x = x;
@@ -26,7 +24,7 @@ color newColor(int R, int G, int B){
     return new;
 }
 
-text newText(color RGBIdle, color RGBhover, color RGBclick, int size, coord2D position, char string[64], int weigth){
+text newText(color RGBIdle, color RGBhover, color RGBclick, int size, coord2D position, char *string, int weigth){
     text new;
     new.RGBIdle = RGBIdle;
     new.RGBhover = RGBhover;
@@ -34,6 +32,7 @@ text newText(color RGBIdle, color RGBhover, color RGBclick, int size, coord2D po
     new.size = size;
     new.position = position;
     new.weigth = weigth;
+    new.string = (char*) malloc(sizeof(string));
     strcpy(new.string, string);
     return new;
 }
@@ -91,7 +90,7 @@ void cercle(float centreX, float centreY){
 	}
 }
 
-void printUI(button buttons[], int arraySizeB, slider sliders[], int arraySizeS, text texts[], int arraySizeT)
+void printUI(button *buttons, int arraySizeB, slider *sliders, int arraySizeS, text *texts, int arraySizeT)
 {   
     for(int n = 0; n < arraySizeB; n++){
         button b = buttons[n];
@@ -159,7 +158,7 @@ void printUI(button buttons[], int arraySizeB, slider sliders[], int arraySizeS,
 
 //GESTION D'EVENTS
 
-action whenClickedUI(button buttons[], int arraySizeB, slider sliders[], int arraySizeS, coord2D mouse)
+action whenClickedUI(button* buttons, int arraySizeB, slider* sliders, int arraySizeS, coord2D mouse)
 {   
     action resultAction = none;
     for(int n = 0; n < arraySizeB; n++){
@@ -177,7 +176,7 @@ action whenClickedUI(button buttons[], int arraySizeB, slider sliders[], int arr
     return resultAction;
 }
 
-action whenReleasedUI(button buttons[], int arraySizeB, slider sliders[], int arraySizeS)
+action whenReleasedUI(button *buttons, int arraySizeB, slider *sliders, int arraySizeS)
 {   
     coord2D mouse = new2Dcoord(abscisseSouris(),ordonneeSouris());
     action resultAction = none;
@@ -198,7 +197,7 @@ action whenReleasedUI(button buttons[], int arraySizeB, slider sliders[], int ar
     return resultAction;
 }
 
-void whenHoverUI(button buttons[], int arraySizeB, slider sliders[], int arraySizeS, coord2D mouse)
+void whenHoverUI(button *buttons, int arraySizeB, slider *sliders, int arraySizeS, coord2D mouse)
 {   
     for(int n = 0; n < arraySizeB; n++){
         if(mouse.x >= buttons[n].startPoint.x && mouse.y >= buttons[n].startPoint.y  && mouse.x <= buttons[n].endPoint.x &&  mouse.y <= buttons[n].endPoint.y && buttons[n].state != Hiden){
@@ -223,7 +222,7 @@ void whenHoverUI(button buttons[], int arraySizeB, slider sliders[], int arraySi
     }
 }
 
-//MAJ ELEMENTS
+//UPDATE ELEMENTS
 
 void updateButton(button *b, coord2D centerPoint){
     b->centerPoint = centerPoint;
@@ -240,6 +239,9 @@ void updateSlider(slider *s, coord2D centerPoint){
     s->cursor.y = centerPoint.y;
 }
 
-void updateText(text *t, coord2D position){
+void updateText(text *t, coord2D position, char* string){
     t->position = position;
+    free(t->string);
+    t->string = (char*) malloc(sizeof(string));
+    strcpy(t->string, string);
 }

@@ -9,13 +9,14 @@
 #include "../SmartUI/SmartUI.h"
 
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
-#define LargeurFenetre 800
-#define HauteurFenetre 600
+#define LargeurFenetre 1200
+#define HauteurFenetre 800
 #define MATRIX_H 500
 #define MATRIX_W 1000
 
 void gestionEvenement(EvenementGfx evenement);
 void iniCellData(int ***tab, int DataSizeX, int DataSizeY);
+void freeCellData(int ***tab, int W, int H);
 
 int main(int argc, char **argv)
 {
@@ -27,38 +28,82 @@ int main(int argc, char **argv)
 
 void gestionEvenement(EvenementGfx evenement)
 {
+	//Matrice de données
 	static int DataSizeX = MATRIX_W;
 	static int DataSizeY = MATRIX_H;
-	static int HcellCap; //Nombre de celulles pouvant être affichées en hauteur
-	static int WcellCap; //Nombre de celulles pouvant être affichées en largeur 
-	static int **CellData = NULL; //Matrice de donnée
-	static int CellSize = 10; //Taille d'une cellule en pixel
-	static int CellInBetween = 1; //Taille de l'espace inter cellules  en pixel
+	static int **CellData = NULL;
+	static int tickCount = 0;
+
+	//Drag&Snap et Zoom
 	static int DeltaX = 0;
 	static int DeltaY = 0;
-	static bool pause = true;
 	static bool RCD = false;
 	static int XDRC = 0;
 	static int YDRC = 0;
-	switch (evenement)
-	{
+
+	//Affichage
+	static int CellSize = 10;
+	static int CellInBetween = 1;
+	static int HcellCap;
+	static int WcellCap;
+
+	//Menu Elements
+	static bool pause = true;
+	static int MenuWidth = 400;
+	static bool MenuStatus = true;
+	static DonneesImageRGB *header = NULL;
+	static button *buttons = NULL;
+	static slider *sliders = NULL;
+	static text *texts = NULL;
+	static int nButtons = 0;
+	static int nSliders = 0;
+	static int nTexts = 0;
+	static unsigned long int generationNumber = 0;
+
+
+	switch (evenement){
 		case Initialisation:
+			;
+			//Menu
+			header = lisBMPRGB("/#Ressources/header.bmp");
+			color RGBIdle = newColor(45,45,48);
+			color RGBHover = newColor(55,55,58);
+			color RGBClick = newColor(8,86,123);
+			color RGBwhite = newColor(255,255,255);
+			coord2D Origin = new2Dcoord(largeurFenetre() - MenuWidth, hauteurFenetre() - 80);
+
+			nTexts = 2;
+			texts = malloc(sizeof(text)*nTexts);
+			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "Conway's", 5);
+			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 105), "Game of Life", 2);
+
+			//Data
 			iniCellData(&CellData, DataSizeX, DataSizeY);
 			DeltaX = DataSizeX/4;
 			DeltaY = DataSizeY/4;
-			demandeTemporisation(60);
+			demandeTemporisation(30);
         break;
 		
 		case Temporisation: ;
+
+			//Data process
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			if(HcellCap > DataSizeY || WcellCap > DataSizeX) printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
-			if(!pause) ConnwayTransform(CellData, DataSizeX, DataSizeY);
+			WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
+			if(HcellCap > DataSizeY || WcellCap > DataSizeX){
+				printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
+				exit(EXIT_FAILURE);
+			}
+			if(!pause) conwayTransform(CellData, DataSizeX, DataSizeY);
+
+			//Menu
+			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 			rafraichisFenetre();
+
 			break;
 		
 		case Affichage:
 			effaceFenetre (0, 0, 0);
+			//Affichage des cellules, en se basant sur les données de transformation de "ZOOM" et "Drag&Snap"
 			for (int y = DeltaY; y < (HcellCap + 1 + DeltaY); y++){
 				for (int x = DeltaX; x < (WcellCap + 1 + DeltaX); x++){
 					int LBCx = x * (CellSize + CellInBetween) + CellInBetween - (DeltaX * (CellSize + CellInBetween));
@@ -66,23 +111,31 @@ void gestionEvenement(EvenementGfx evenement)
 					int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
 					int RTCy = y * (CellSize + CellInBetween) + CellInBetween - (DeltaY * (CellSize + CellInBetween));
 					CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(255, 255, 255);
-					rectangle(LBCx, LBCy, RTCx, RTCy);
+					if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 				}
 			}
+			// ecrisImage(largeurFenetre()-MenuWidth, hauteurFenetre() - header->hauteurImage, header->largeurImage, header->hauteurImage, header->donneesRGB);
+			couleurCourante(25, 25, 25);
+			if(MenuStatus) rectangle(largeurFenetre()-MenuWidth,hauteurFenetre(),largeurFenetre(),0);
+			//Menu
+			printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
 			break;
 
-		case BoutonSouris:;
+		case BoutonSouris:
+			; //Aproximation de la position de la souris sur la grille
 			float fx = abscisseSouris() / (CellSize + CellInBetween);
 			float fy = ordonneeSouris() / (CellSize + CellInBetween);
+
 			if (etatBoutonSouris() == GaucheAppuye){
 				//Indentification de la ceullule cible
 				int Sx = floorf(fx) + DeltaX;
 				int Sy = floorf(fy) + DeltaY;
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
-				if ((Sx < DataSizeX) && (Sy < DataSizeY))
+				if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - MenuWidth) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
 			}
-			//AddOn Zoom sur la grille
+
+			//Zoom : IN & OUT (ScrollUp et ScrollDown addons pour gfxlib)
 			bool NeedScrollUpdate = false;
 			if (etatBoutonSouris() == ScrollUp && CellSize < 50 && !RCD){
 				CellSize *= 1.4;
@@ -94,17 +147,19 @@ void gestionEvenement(EvenementGfx evenement)
 				NeedScrollUpdate = true;
 			}
 
+			//Drag&Snap : Traitement de la position du curseur si le clic droit et maintenu.
 			if(etatBoutonSouris() == DroiteAppuye){
 				XDRC = abscisseSouris() / (CellSize + CellInBetween);
 				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				RCD = true;
 			}
-			
+			//Drag&Snap : Relachement du clic
 			if(etatBoutonSouris() == DroiteRelache) RCD = false;
 
+			//Zoom : Calcul du déplacement sur la grille
 			if(NeedScrollUpdate){
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-				WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+				WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
 				DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
 				DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
 				if(DeltaX < 0) DeltaX = 0;
@@ -116,6 +171,7 @@ void gestionEvenement(EvenementGfx evenement)
 			rafraichisFenetre();
 			break;
 		case Souris:
+			//Drag&Snap quand le clic droit est maintenu
 			if(RCD){
 				DeltaX += floorf(XDRC) - floorf(abscisseSouris() / (CellSize + CellInBetween));
 				DeltaY += floorf(YDRC) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
@@ -134,15 +190,33 @@ void gestionEvenement(EvenementGfx evenement)
 		case Redimensionnement:
 			//Mise à jour de la fenêtre
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+			WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
 			rafraichisFenetre();
 			break;
 	}
 }
 
-//Initialisation à 0 de la matrice
+//Allocation dynamique et initialisation à 0 de la matrice
 void iniCellData(int ***tab, int W, int H){
 	*tab = (int**) malloc(sizeof(int*)*H);
-	for(int y = 0; y<H; y++) (*tab)[y] = (int*) malloc(sizeof(int)*W);
+	if(*tab == NULL || (int) *tab == 0 ){
+		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCellData 1:0)");
+		exit(EXIT_FAILURE);
+	}
+	for(int y = 0; y<H; y++){
+		(*tab)[y] = (int*) malloc(sizeof(int)*W);
+		if((*tab)[y] == NULL){
+			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCellData 2:%d)", y);
+			for(int Y = 0; Y<y; Y++) free((*tab)[Y]);
+			free(*tab);
+			exit(EXIT_FAILURE);
+		}
+	}
 	for(int x = 0; x<W; x++) for(int y = 0; y<H; y++) (*tab)[y][x] = 0;
+}
+
+//Libération de la mémoire
+void freeCellData(int ***tab, int W, int H){
+	for(int y = 0; y<H; y++) free((*tab)[y]);
+	free(*tab);
 }

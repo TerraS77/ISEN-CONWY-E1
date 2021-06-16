@@ -1,7 +1,27 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "ConwayEngine.h" 
 
-void ConnwayTransform(int **CellData, int MW, int MH){
-	int CellDataCache[MH][MW];
+void conwayTransform(int **CellData, int MW, int MH){
+	
+	//Allocation de la mémoire cache
+	int **CellDataCache;
+	CellDataCache = (int**) malloc(sizeof(int*)*MH);
+	if(CellDataCache == NULL){
+		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCache 1:0)");
+		exit(EXIT_FAILURE);
+	}
+	for(int y = 0; y<MH; y++){
+		CellDataCache[y] = (int*) malloc(sizeof(int)*MW);
+		if(CellDataCache[y] == NULL){
+			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCache 2:%d)", y);
+			for(int Y = 0; Y<y; Y++) free(CellDataCache[Y]);
+			free(CellDataCache);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	//Conway Process
 	for(int x = 0; x<MW; x++){
 		for(int y = 0; y<MH; y++){
 			//Récupération de voisins
@@ -17,8 +37,13 @@ void ConnwayTransform(int **CellData, int MW, int MH){
 			}
 		}
 	}
+
 	//Merging du cache
-	for(int x = 0; x<1000; x++) for(int y = 0; y<MH; y++) CellData[y][x] = CellDataCache[y][x];
+	for(int x = 0; x<MW; x++) for(int y = 0; y<MH; y++) CellData[y][x] = CellDataCache[y][x];
+
+	//Libération de la mémoire cache
+	for(int y = 0; y<MH; y++) free(CellDataCache[y]);
+	free(CellDataCache);
 }
 
 int getAliveNeyboors(int **tab, int x, int y, int xmax, int ymax){
