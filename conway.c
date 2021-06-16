@@ -31,8 +31,8 @@ void gestionEvenement(EvenementGfx evenement)
 	static int CellDataCache[MATRIX_H][MATRIX_W]; //Cache de la matrice (utilisé pour t+1 à partir de t)
 	static int CellSize = 10; //Taille d'une cellule en pixel
 	static int CellInBetween = 1; //Taille de l'espace inter cellules  en pixel
-	static int DeltaX = 0;
-	static int DeltaY = 0;
+	static int DeltaX = MATRIX_W/4;
+	static int DeltaY = MATRIX_H/4;
 	static bool pause = true;
 	static bool RCD = false;
 	static int XDRC = 0;
@@ -110,11 +110,12 @@ void gestionEvenement(EvenementGfx evenement)
 			//AddOn Zoom sur la grille
 			bool NeedScrollUpdate = false;
 			if (etatBoutonSouris() == ScrollUp && CellSize < 50 && !RCD){
-				CellSize *= 1.5;
+				CellSize *= 1.4;
 				NeedScrollUpdate = true;
 			}
-			if (etatBoutonSouris() == ScrollDown && CellSize > 5 && !RCD){
-				CellSize *= 0.5;
+			if (etatBoutonSouris() == ScrollDown && CellSize > 4 && !RCD){
+				CellSize *= 0.6;
+				if(CellSize < 4) CellSize = 4;
 				NeedScrollUpdate = true;
 			}
 
@@ -148,9 +149,9 @@ void gestionEvenement(EvenementGfx evenement)
 				XDRC = abscisseSouris() / (CellSize + CellInBetween);
 				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				if(DeltaX < 0) DeltaX = 0;
-				if(DeltaX + WcellCap >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
+				if(DeltaX + WcellCap - 1 >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
 				if(DeltaY < 0) DeltaY = 0;
-				if(DeltaY + HcellCap >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
+				if(DeltaY + HcellCap - 1 >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
 			}
 			break;
 		case Clavier:
