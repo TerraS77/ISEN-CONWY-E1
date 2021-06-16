@@ -44,7 +44,6 @@ void gestionEvenement(EvenementGfx evenement)
 	{
 		case Initialisation:
 			iniCellData(&CellData, DataSizeX, DataSizeY);
-			printf("%d", CellData[0][0]);
 			DeltaX = DataSizeX/4;
 			DeltaY = DataSizeY/4;
 			demandeTemporisation(60);
@@ -144,9 +143,6 @@ void gestionEvenement(EvenementGfx evenement)
 //Initialisation à 0 de la matrice
 void iniCellData(int ***tab, int W, int H){
 	*tab = (int**) malloc(sizeof(int*)*H);
-	printf("%p\n", *tab);
 	for(int y = 0; y<H; y++) (*tab)[y] = (int*) malloc(sizeof(int)*W);
-	printf("%p\n", (*tab)[0]);
 	for(int x = 0; x<W; x++) for(int y = 0; y<H; y++) (*tab)[y][x] = 0;
-	printf("%d\n", (*tab)[0][0]);
 }
