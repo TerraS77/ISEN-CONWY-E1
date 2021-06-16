@@ -8,7 +8,7 @@
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
 #define LargeurFenetre 800
 #define HauteurFenetre 600
-#define MATRIX_H 600
+#define MATRIX_H 500
 #define MATRIX_W 1000
 
 void gestionEvenement(EvenementGfx evenement);
