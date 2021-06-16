@@ -218,7 +218,7 @@ static void prepareFenetre_En_DeTaille(const char *nom, int xCoinHautGauche, int
 	if (sFonctionClavierSpecial == NULL) sFonctionClavierSpecial = fonctionClavierSpecial;
 	if (sFonctionBoutonsSouris == NULL) sFonctionBoutonsSouris = fonctionBoutonsSouris;
 	if (sFonctionDeplacementSouris == NULL) sFonctionDeplacementSouris = fonctionDeplacementSouris;
-	//if (sFonctionDeplacementPassifSouris == NULL) sFonctionDeplacementPassifSouris = fonctionDeplacementPassifSouris;
+	if (sFonctionDeplacementPassifSouris == NULL) sFonctionDeplacementPassifSouris = fonctionDeplacementPassifSouris;
 	// La fonction de gestion de deplacement passif souris n'est pas geree par defaut car elle consomme trop de ressources
 	if (sFonctionRedimensionnement == NULL) sFonctionRedimensionnement = fonctionRedimensionnement;
 

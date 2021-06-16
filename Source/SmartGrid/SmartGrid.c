@@ -1,19 +1,21 @@
 #include <stdlib.h> // Pour pouvoir utiliser exit()
 #include <stdio.h> // Pour pouvoir utiliser printf()
 #include <math.h> // Pour pouvoir utiliser sin() et cos()
-#include "GfxLib.h" // Seul cet include est necessaire pour faire du graphique
-#include "BmpLib.h" // Cet include permet de manipuler des fichiers BMP
-#include "ESLib.h" // Pour utiliser valeurAleatoire()
+#include <string.h>
+#include "../GfxLib/GfxLib.h" // Seul cet include est necessaire pour faire du graphique
+#include "../GfxLib/BmpLib.h" // Cet include permet de manipuler des fichiers BMP
+#include "../GfxLib/ESLib.h" // Pour utiliser valeurAleatoire()
+#include "../ConwayEngine/ConwayEngine.h"
+#include "../SmartUI/SmartUI.h"
 
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
 #define LargeurFenetre 800
 #define HauteurFenetre 600
-#define MATRIX_H 550
+#define MATRIX_H 500
 #define MATRIX_W 1000
 
 void gestionEvenement(EvenementGfx evenement);
-void iniCellData(int tab[][1000]);
-int getAliveNeyboors(int tab[][1000], int x, int y, int xmax, int ymax);
+void iniCellData(int ***tab, int DataSizeX, int DataSizeY);
 
 int main(int argc, char **argv)
 {
@@ -25,14 +27,15 @@ int main(int argc, char **argv)
 
 void gestionEvenement(EvenementGfx evenement)
 {
+	static int DataSizeX = MATRIX_W;
+	static int DataSizeY = MATRIX_H;
 	static int HcellCap; //Nombre de celulles pouvant être affichées en hauteur
 	static int WcellCap; //Nombre de celulles pouvant être affichées en largeur 
-	static int CellData[MATRIX_H][MATRIX_W]; //Matrice de donnée
-	static int CellDataCache[MATRIX_H][MATRIX_W]; //Cache de la matrice (utilisé pour t+1 à partir de t)
+	static int **CellData = NULL; //Matrice de donnée
 	static int CellSize = 10; //Taille d'une cellule en pixel
 	static int CellInBetween = 1; //Taille de l'espace inter cellules  en pixel
-	static int DeltaX = MATRIX_W/4;
-	static int DeltaY = MATRIX_H/4;
+	static int DeltaX = 0;
+	static int DeltaY = 0;
 	static bool pause = true;
 	static bool RCD = false;
 	static int XDRC = 0;
@@ -40,50 +43,23 @@ void gestionEvenement(EvenementGfx evenement)
 	switch (evenement)
 	{
 		case Initialisation:
-			//Initialisation de la matrice de données
-			iniCellData(CellData);
-			//Calcul de la capacité d'affichage avec la taille de fenêtre courante
-			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			//Lancement de la routine
+			iniCellData(&CellData, DataSizeX, DataSizeY);
+			printf("%d", CellData[0][0]);
+			DeltaX = DataSizeX/4;
+			DeltaY = DataSizeY/4;
 			demandeTemporisation(60);
         break;
-
+		
 		case Temporisation: ;
-			//Mise à jour de la capacité d'affichage avec la taille de fenêtre courante
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			WcellCap = (largeurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			//Log si le nombre de cellules potentielles > cellules réelles
-			if(HcellCap > MATRIX_H || WcellCap > MATRIX_W) printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > MATRIX_H ? "Y" : "X");
-			//Calcul et application de t+1 (Si la pause n'est pas active)
-			if(!pause){
-				for(int x = 0; x<MATRIX_W; x++){
-					for(int y = 0; y<MATRIX_H; y++){
-						//Récupération de voisins
-						int AN = getAliveNeyboors(CellData, x, y, MATRIX_W, MATRIX_H);
-						//Calcul de l'état à t+1 pour chaque cellules et stockage dans le cache 
-						if(CellData[y][x] == 1){
-							if(AN >= 2 && AN <= 3){
-								CellDataCache[y][x] = 1;
-							}else CellDataCache[y][x] = 0;
-						}else{
-							if(AN == 3) CellDataCache[y][x] = 1;
-							else CellDataCache[y][x] = 0;
-						}
-					}
-				}
-				//Merging du cache
-				for(int x = 0; x<1000; x++) for(int y = 0; y<MATRIX_H; y++) CellData[y][x] = CellDataCache[y][x];
-			}
+			if(HcellCap > DataSizeY || WcellCap > DataSizeX) printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
+			if(!pause) ConnwayTransform(CellData, DataSizeX, DataSizeY);
 			rafraichisFenetre();
 			break;
 		
 		case Affichage:
 			effaceFenetre (0, 0, 0);
-			//Affichage de la grille, avec :
-			//x,y les coordonnées dans la matrices
-			//LBCx, LBCy les coordonnées du point infèrieur gauche du carré dans la fenêtre
-			//RTCx, RTCy les coordonnées du point supèrieur droit du carré dans la fenêtre
 			for (int y = DeltaY; y < (HcellCap + 1 + DeltaY); y++){
 				for (int x = DeltaX; x < (WcellCap + 1 + DeltaX); x++){
 					int LBCx = x * (CellSize + CellInBetween) + CellInBetween - (DeltaX * (CellSize + CellInBetween));
@@ -104,8 +80,8 @@ void gestionEvenement(EvenementGfx evenement)
 				int Sx = floorf(fx) + DeltaX;
 				int Sy = floorf(fy) + DeltaY;
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
-				if ((Sx < MATRIX_W) && (Sy < MATRIX_H))
-					if (((Sx) < MATRIX_W) && ((Sy) < MATRIX_H) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
+				if ((Sx < DataSizeX) && (Sy < DataSizeY))
+					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
 			}
 			//AddOn Zoom sur la grille
 			bool NeedScrollUpdate = false;
@@ -125,9 +101,7 @@ void gestionEvenement(EvenementGfx evenement)
 				RCD = true;
 			}
 			
-			if(etatBoutonSouris() == DroiteRelache){
-				RCD = false;
-			}
+			if(etatBoutonSouris() == DroiteRelache) RCD = false;
 
 			if(NeedScrollUpdate){
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
@@ -135,9 +109,9 @@ void gestionEvenement(EvenementGfx evenement)
 				DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
 				DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
 				if(DeltaX < 0) DeltaX = 0;
-				if(DeltaX + WcellCap >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
+				if(DeltaX + WcellCap >= DataSizeX) DeltaX = DataSizeX - WcellCap;
 				if(DeltaY < 0) DeltaY = 0;
-				if(DeltaY + HcellCap >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
+				if(DeltaY + HcellCap >= DataSizeY) DeltaY = DataSizeY - HcellCap;
 			}
 
 			rafraichisFenetre();
@@ -149,9 +123,9 @@ void gestionEvenement(EvenementGfx evenement)
 				XDRC = abscisseSouris() / (CellSize + CellInBetween);
 				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				if(DeltaX < 0) DeltaX = 0;
-				if(DeltaX + WcellCap - 1 >= MATRIX_W) DeltaX = MATRIX_W - WcellCap;
+				if(DeltaX + WcellCap - 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap;
 				if(DeltaY < 0) DeltaY = 0;
-				if(DeltaY + HcellCap - 1 >= MATRIX_H) DeltaY = MATRIX_H - HcellCap;
+				if(DeltaY + HcellCap - 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap;
 			}
 			break;
 		case Clavier:
@@ -168,18 +142,11 @@ void gestionEvenement(EvenementGfx evenement)
 }
 
 //Initialisation à 0 de la matrice
-void iniCellData(int tab[][MATRIX_W]){
-	for(int x = 0; x<MATRIX_W; x++) for(int y = 0; y<MATRIX_H; y++) tab[y][x] = 0;
+void iniCellData(int ***tab, int W, int H){
+	*tab = (int**) malloc(sizeof(int*)*H);
+	printf("%p\n", *tab);
+	for(int y = 0; y<H; y++) (*tab)[y] = (int*) malloc(sizeof(int)*W);
+	printf("%p\n", (*tab)[0]);
+	for(int x = 0; x<W; x++) for(int y = 0; y<H; y++) (*tab)[y][x] = 0;
+	printf("%d\n", (*tab)[0][0]);
 }
-
-//Calcul des voisins vivants
-int getAliveNeyboors(int tab[][MATRIX_W], int x, int y, int xmax, int ymax){
-	int AN = 0;
-	for(int ty = -1; ty < 2 ; ty++){
-		for(int tx = -1; tx < 2; tx++){
-			if((x+tx) > 0 && (x+tx) < xmax && (y+ty) > 0 && (y+ty) < ymax) 
-				if(tab[y+ty][x+tx] == 1) AN++;
-		}
-	}
-	return (AN-tab[y][x]);
-};
