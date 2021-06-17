@@ -64,6 +64,8 @@ void gestionEvenement(EvenementGfx evenement)
 	static int temps=0;
 	static int positionX=0;
 	static int positionY=0;
+	static int seuil=0;
+	static int tick = 0;
 
 
 	switch (evenement){
@@ -88,13 +90,14 @@ void gestionEvenement(EvenementGfx evenement)
 			
 			nSliders = 1;
 			sliders = malloc(sizeof(slider)*nSliders);
-			sliders[0] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 30,hauteurFenetre() - 250), 300, 0, 300, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed,false);
-
-			nButtons = 2;
+			sliders[0] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 300), 200, 0, 200, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed,false);
+			sliders[0].value= 100;
+			nButtons = 3;
 			buttons = malloc(sizeof(button)*nButtons);
-			buttons[0]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 30,hauteurFenetre() - 500), 150, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 30, new2Dcoord(0,0), "Quitter", 2), Leave, true, false);
-			buttons[1]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 30,hauteurFenetre() - 400), 150, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 30, new2Dcoord(0,0), "Pause", 2), TogglePause, true, false);
-			
+			buttons[0]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 500), 150, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 30, new2Dcoord(0,0), "Quitter", 2), Leave, false, false);
+			buttons[1]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 90,hauteurFenetre() - 400), 100, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 30, new2Dcoord(0,0), "Pause", 2), TogglePause, true, false);
+			buttons[2]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200,hauteurFenetre() - 400), 100, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 30, new2Dcoord(0,0), "Reset", 2), RESET, false, false);
+
 			//Data
 			iniCellData(&CellData, DataSizeX, DataSizeY);
 			DeltaX = DataSizeX/4;
@@ -112,9 +115,14 @@ void gestionEvenement(EvenementGfx evenement)
 				printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
 				exit(EXIT_FAILURE);
 			}
+			seuil = 1 / ((float) sliders->value/ (float) sliders->max);
 			if(!pause)
 			{ 
+				tick++;
+				if(tick>=seuil) tick = 0;
+				if(tick==0){
 				conwayTransform(CellData, DataSizeX, DataSizeY);
+				}
 				
 				temps++;
 			}
@@ -148,11 +156,15 @@ void gestionEvenement(EvenementGfx evenement)
 			if(MenuStatus){
 				updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50));
 				updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80));
-				updateSlider(&sliders[0],new2Dcoord(largeurFenetre() - MenuWidth + 30,hauteurFenetre() - 250));
+				updateSlider(&sliders[0],new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 300));
+				updateButton(&buttons[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 500)));
+				updateButton(&buttons[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90,hauteurFenetre() - 400)));
+				updateButton(&buttons[2], (new2Dcoord(largeurFenetre() - MenuWidth + 200,hauteurFenetre() - 400)));
+
 			}
 			rafraichisFenetre();
 			break;
-		
+		 
 		case Affichage:
 			effaceFenetre (0, 0, 0);
 			//Affichage des cellules, en se basant sur les données de transformation de "ZOOM" et "Drag&Snap"
@@ -208,22 +220,34 @@ void gestionEvenement(EvenementGfx evenement)
 				RCD = true;
 			}
 			//Drag&Snap : Relachement du clic
+			
 			if(etatBoutonSouris() == DroiteRelache) RCD = false;
+			if (etatBoutonSouris() == GaucheAppuye){
+			
+			switch (whenClickedUI(buttons,nButtons,sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()))){
+
+				case RESET :
+					temps=0;
+					iniCellData(&CellData, DataSizeX, DataSizeY);
+					break;
+			case Leave :
+					freeCellData(&CellData,DataSizeX, DataSizeY);
+					exit(EXIT_SUCCESS);
+					break;
+			}
+			}
+			
+			if(etatBoutonSouris() == GaucheRelache){
+
+			
 			switch (whenReleasedUI(buttons,nButtons,sliders,nSliders))
 			{
 			case TogglePause :
 					pause = !pause;
 				
 					break;
-			case RESET :
-					temps=0;
-					iniCellData(&CellData, DataSizeX, DataSizeY);
-					break;
-			case Leave :
-					
-					exit(EXIT_SUCCESS);
-					break;
-				}
+			
+				}}
 			whenHoverUI(buttons, nButtons,sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 			//Zoom : Calcul du déplacement sur la grille
 			if(NeedScrollUpdate){
