@@ -1,1 +1,3 @@
-make deepclean && make && ./conwayApp
+make deepclean 
+make
+./conwayApp
