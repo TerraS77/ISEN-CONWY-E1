@@ -150,7 +150,7 @@ DonneesImageRGB *lisBMPRGB(char *nom)
 									free(donneesImage->donneesRGB);
 								}
 							}
-						}
+						}else printf("BMP LIB : Image compressée ou à encodage != 64 bits");
 					}
 				}
 			}
@@ -158,7 +158,7 @@ DonneesImageRGB *lisBMPRGB(char *nom)
 			
 			/* Quoi qu'il arrive il faut fermer le fichier */
 			fclose(fichierBMP);
-		}
+		}else printf("BMP LIB : Impossible d'ouvrir l'image");
 		
 		/* Si tout ne s'est pas bien passe on libere les donnees image et on les met a NULL */
 		if

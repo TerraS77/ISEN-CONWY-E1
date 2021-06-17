@@ -239,9 +239,9 @@ void updateSlider(slider *s, coord2D centerPoint){
     s->cursor.y = centerPoint.y;
 }
 
-void updateText(text *t, coord2D position, char* string){
+void updateText(text *t, coord2D position){
     t->position = position;
-    free(t->string);
-    t->string = (char*) malloc(sizeof(string));
-    strcpy(t->string, string);
+    // free(t->string);
+    // t->string = (char*) malloc(sizeof(string));
+    // strcpy(t->string, string);
 }

@@ -2,6 +2,7 @@
 #include <stdio.h> // Pour pouvoir utiliser printf()
 #include <math.h> // Pour pouvoir utiliser sin() et cos()
 #include <string.h>
+#include <dirent.h>
 #include "../GfxLib/GfxLib.h" // Seul cet include est necessaire pour faire du graphique
 #include "../GfxLib/BmpLib.h" // Cet include permet de manipuler des fichiers BMP
 #include "../GfxLib/ESLib.h" // Pour utiliser valeurAleatoire()
@@ -49,7 +50,7 @@ void gestionEvenement(EvenementGfx evenement)
 
 	//Menu Elements
 	static bool pause = true;
-	static int MenuWidth = 400;
+	static int MenuWidth = 290;
 	static bool MenuStatus = true;
 	static DonneesImageRGB *header = NULL;
 	static button *buttons = NULL;
@@ -65,7 +66,7 @@ void gestionEvenement(EvenementGfx evenement)
 		case Initialisation:
 			;
 			//Menu
-			header = lisBMPRGB("/#Ressources/header.bmp");
+			header = lisBMPRGB("#Ressources/header.bmp");
 			color RGBIdle = newColor(45,45,48);
 			color RGBHover = newColor(55,55,58);
 			color RGBClick = newColor(8,86,123);
@@ -74,8 +75,8 @@ void gestionEvenement(EvenementGfx evenement)
 
 			nTexts = 2;
 			texts = malloc(sizeof(text)*nTexts);
-			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "Conway's", 5);
-			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 105), "Game of Life", 2);
+			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "CONWAY'S", 4);
+			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80), "Game of Life", 2);
 
 			//Data
 			iniCellData(&CellData, DataSizeX, DataSizeY);
@@ -88,7 +89,7 @@ void gestionEvenement(EvenementGfx evenement)
 
 			//Data process
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
+			WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
 			if(HcellCap > DataSizeY || WcellCap > DataSizeX){
 				printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
 				exit(EXIT_FAILURE);
@@ -97,8 +98,11 @@ void gestionEvenement(EvenementGfx evenement)
 
 			//Menu
 			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
+			if(MenuStatus){
+				updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50));
+				updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80));
+			}
 			rafraichisFenetre();
-
 			break;
 		
 		case Affichage:
@@ -114,11 +118,13 @@ void gestionEvenement(EvenementGfx evenement)
 					if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 				}
 			}
-			// ecrisImage(largeurFenetre()-MenuWidth, hauteurFenetre() - header->hauteurImage, header->largeurImage, header->hauteurImage, header->donneesRGB);
-			couleurCourante(25, 25, 25);
-			if(MenuStatus) rectangle(largeurFenetre()-MenuWidth,hauteurFenetre(),largeurFenetre(),0);
+			couleurCourante(28, 28, 28);
+			if(MenuStatus){
+				rectangle(largeurFenetre()-MenuWidth,hauteurFenetre(),largeurFenetre(),0);
+				ecrisImage(largeurFenetre()-MenuWidth, hauteurFenetre()-210, header->largeurImage, header->hauteurImage, header->donneesRGB);
+				printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
+			}
 			//Menu
-			printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
 			break;
 
 		case BoutonSouris:
@@ -131,7 +137,7 @@ void gestionEvenement(EvenementGfx evenement)
 				int Sx = floorf(fx) + DeltaX;
 				int Sy = floorf(fy) + DeltaY;
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
-				if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - MenuWidth) && (ordonneeSouris() < hauteurFenetre()))
+				if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
 			}
 
@@ -159,7 +165,7 @@ void gestionEvenement(EvenementGfx evenement)
 			//Zoom : Calcul du déplacement sur la grille
 			if(NeedScrollUpdate){
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-				WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
+				WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
 				DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
 				DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
 				if(DeltaX < 0) DeltaX = 0;
@@ -190,7 +196,7 @@ void gestionEvenement(EvenementGfx evenement)
 		case Redimensionnement:
 			//Mise à jour de la fenêtre
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
-			WcellCap = (largeurFenetre() - CellInBetween - MenuWidth) / (CellSize + CellInBetween);
+			WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
 			rafraichisFenetre();
 			break;
 	}
@@ -199,7 +205,7 @@ void gestionEvenement(EvenementGfx evenement)
 //Allocation dynamique et initialisation à 0 de la matrice
 void iniCellData(int ***tab, int W, int H){
 	*tab = (int**) malloc(sizeof(int*)*H);
-	if(*tab == NULL || (int) *tab == 0 ){
+	if(*tab == NULL){
 		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCellData 1:0)");
 		exit(EXIT_FAILURE);
 	}

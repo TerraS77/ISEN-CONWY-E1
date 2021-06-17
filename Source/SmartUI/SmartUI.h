@@ -67,4 +67,4 @@ action whenReleasedUI(button buttons[], int arraySize, slider sliders[], int arr
 void whenHoverUI(button buttons[], int arraySize, slider sliders[], int arraySizeS, coord2D mouse);
 void updateButton(button *b, coord2D centerPoint);
 void updateSlider(slider *s, coord2D centerPoint);
-void updateText(text *t, coord2D position, char *string);
+void updateText(text *t, coord2D position);
