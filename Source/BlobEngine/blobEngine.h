@@ -48,26 +48,35 @@ typedef struct{
     int biomass_biomassPR;
     blob_agent *agents;
     int nAgents;
-}blob;
+    float isExpanding;
+}blob_blob;
 
-typdef struct{
+typedef struct{
     float TranCap; //Multip. de transport par unité de biomasse
-    float FoodCons; //Multip. de consomation de nutriments par unitées de biomasse
-    float VeinCap; //Capacitée de transport des corps veneux
+    float nutrCons; //Multip. de consomation de nutriments par unitées de biomasse
+    float VeinCap; //Multip. Capacitée de transport des corps veneux
+    float nutrMinStock; //Multip. stock déclancheur d'un expand
+    float CroitFood; //Multip. de seuil de dévellopement pour les cellules d'exploitations
+    float food_SpeedExp; //Multip de la vitesse de croissance des cellules food
+    float kernel_SpeedExp; //Multip de la vitesse de croissance des cellules kernel
+    float vein_SpeedExp; //Multip de la vitesse de croissance des cellules vein
+    int FoodHarvest; //Unités de nourriture exploitable par unitées de biomasse
     int TranSpeed; //Nombre d'itérations de transport par tours
     int SeuilCredit; //Seuil d'endettement pouvant causer la mort d'une entitée.
     int TTLCredit; //Nombre de tours qu'une cellule peut passée en dépassant le seuil.
+    int StockCap; //Nombre d'unité de nutriments stockables par unitées de biomasses.
 }simulation;
 
 //BLOB
-blob newBlob(cell **cellGrid, int CW, int CW, blob *blob, int *BN, coord2D SP, int ttf, int ttnutr, int ttbio);
+blob_blob newBlob(cell **cellGrid, int CW, int CH, int *BN, coord2D SP, int ttf, int ttnutr, int ttbio, simulation sim);
 blob_cell newBlobCell(cell **cellGrid, cellType type, int food, blob_cellType blob_type, int id, int ttl, int bm, int nutr, coord2D spawn);
-    
+
 cell newCell(cellType type, int food_amount, blob_cellType blob_type, int blob_id, int blob_ttl, int blob_bm, int blob_nutr);
 cell newEmptyCell();
 
-void blobNewRound(cell **cellGrid, int CW, int CW, blob *blob);
-void blobFusion(cell **cellGrid, int CW, int CW, blob *blob, blob *mergedBlob);
-void blobDivision(cell **cellGrid, int CW, int CW, blob *blob, blob *newBlob);
-int getNeyboorsByType(cell **cellGrid, int CW, int CW, coord2D target, cellType type);
+void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *blob_target, simulation sim);
+void blobUpdateStats(blob *target_blob, simulation sim);
+void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
+void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
+int getNeyboorsByType(cell **cellGrid, int CW, int CH, coord2D target, cellType type);
 int newBlobID();
