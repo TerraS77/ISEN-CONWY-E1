@@ -1,5 +1,5 @@
 typedef enum {Idle, Hover, Clicked, Hiden} status;
-typedef enum {none, ToggleNegative, ToggleGreyLevel, ToggleBlur, UpdatedGreyLevel, ToggleSymH, ToggleSymW, UpdateR, UpdateG, UpdateB, UpdateBlur, Pad0, Pad1, Pad2, Pad3, Pad4, Pad5, Pad6, Pad7, Pad8, Pad9, RESET} action;
+typedef enum {none, menu1, menu2, menu3, menu4} action;
 
 typedef struct{
     int x;
