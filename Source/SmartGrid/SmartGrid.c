@@ -60,6 +60,12 @@ void gestionEvenement(EvenementGfx evenement)
 	static int nSliders = 0;
 	static int nTexts = 0;
 	static unsigned long int generationNumber = 0;
+	static int vivant=0;
+	static int gen=0;
+	static int positionX=0;
+	static int positionY=0;
+	static int seuil=0;
+	static int tick = 0;
 
 
 	switch (evenement){
@@ -73,11 +79,28 @@ void gestionEvenement(EvenementGfx evenement)
 			color RGBwhite = newColor(255,255,255);
 			coord2D Origin = new2Dcoord(largeurFenetre() - MenuWidth, hauteurFenetre() - 80);
 
-			nTexts = 2;
+			//TXT
+			nTexts = 6;
 			texts = malloc(sizeof(text)*nTexts);
 			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "CONWAY'S", 4);
 			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80), "Game of Life", 2);
+			texts[2]=newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 180),"Vivant: 0", 2);
+			texts[3] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 225),"Generation : 0", 2);
+			texts[4] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 270),"X:", 2);
+			texts[5] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +150,hauteurFenetre() - 270),"Y:", 2);
+			
+			//SLIDER
+			nSliders = 1;
+			sliders = malloc(sizeof(slider)*nSliders);
+			sliders[0] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 400), 200, 0, 200, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed,false);
+			sliders[0].value= 100;
 
+			//BUTTONS
+			nButtons = 3;
+			buttons = malloc(sizeof(button)*nButtons);
+			buttons[0]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 760), 150, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 25, new2Dcoord(0,0), "Quitter", 2), Leave, false, false);
+			buttons[1]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 90,hauteurFenetre() - 700), 100, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 25, new2Dcoord(0,0), "Pause", 2), TogglePause, true, true);
+			buttons[2]=newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200,hauteurFenetre() - 700), 100, 50, RGBIdle,RGBHover, RGBClick,newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 25, new2Dcoord(0,0), "Reset", 2), RESET, false, false);
 			//Data
 			iniCellData(&CellData, DataSizeX, DataSizeY);
 			DeltaX = DataSizeX/4;
@@ -90,26 +113,58 @@ void gestionEvenement(EvenementGfx evenement)
 			//Data process
 			HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 			WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
+			
 			if(HcellCap > DataSizeY || WcellCap > DataSizeX){
 				printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
 				exit(EXIT_FAILURE);
 			}
-			if(!pause) conwayTransform(CellData, DataSizeX, DataSizeY);
+
+			seuil = 1 / ((float) (sliders->value + 1.0) / (float) sliders->max);
+			if(!pause){ 
+				tick++;
+				if(tick>=seuil) tick = 0;
+				if(tick==0){
+					conwayTransform(CellData, DataSizeX, DataSizeY);
+					gen++;
+				} 
+			}
 
 			//Menu
-			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 			if(MenuStatus){
+				vivant = Vivant(CellData,DataSizeX,DataSizeY);
+				char string[64];
+				sprintf(string,"Cellules: %d",vivant);
+				texts[2]=newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 180),string, 2);
+				char string2[64];
+				sprintf(string2,"Generation: %d",gen);
+				texts[3] =newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 225),string2, 2);
+				float fx2 = abscisseSouris() / (CellSize + CellInBetween);
+				float fy2 = ordonneeSouris() / (CellSize + CellInBetween);
+				int Sx2 = floorf(fx2) + DeltaX;
+				int Sy2 = floorf(fy2) + DeltaY;
+				char string3[100];
+				sprintf(string3,"X: %d",Sx2);
+				texts[4] =newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 270),string3, 2);
+				char string4[100];
+				sprintf(string4,"Y: %d",Sy2);
+				texts[5] =newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +150,hauteurFenetre() - 270),string4, 2);
+				whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 				updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50));
 				updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80));
+				updateSlider(&sliders[0],new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 400));
+				updateButton(&buttons[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 760)));
+				updateButton(&buttons[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90,hauteurFenetre() - 700)));
+				updateButton(&buttons[2], (new2Dcoord(largeurFenetre() - MenuWidth + 200,hauteurFenetre() - 700)));
+
 			}
 			rafraichisFenetre();
 			break;
-		
+		 
 		case Affichage:
 			effaceFenetre (0, 0, 0);
 			//Affichage des cellules, en se basant sur les données de transformation de "ZOOM" et "Drag&Snap"
-			for (int y = DeltaY; y < (HcellCap + 1 + DeltaY); y++){
-				for (int x = DeltaX; x < (WcellCap + 1 + DeltaX); x++){
+			for (int y = DeltaY; y < (HcellCap + (1 + DeltaY)); y++){
+				for (int x = DeltaX; x < (WcellCap + (1 + DeltaX)); x++){
 					int LBCx = x * (CellSize + CellInBetween) + CellInBetween - (DeltaX * (CellSize + CellInBetween));
 					int LBCy = (y + 1) * (CellSize + CellInBetween) - (DeltaY * (CellSize + CellInBetween));
 					int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
@@ -159,9 +214,25 @@ void gestionEvenement(EvenementGfx evenement)
 				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				RCD = true;
 			}
+
 			//Drag&Snap : Relachement du clic
 			if(etatBoutonSouris() == DroiteRelache) RCD = false;
 
+
+			if (etatBoutonSouris() == GaucheAppuye){
+				switch (whenClickedUI(buttons,nButtons,sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()))){
+					case RESET :
+						gen=0;
+						iniCellData(&CellData, DataSizeX, DataSizeY);
+						break;
+					case Leave :
+						freeCellData(&CellData,DataSizeX, DataSizeY);
+						exit(EXIT_SUCCESS);
+						break;
+				}
+			}
+
+			if(etatBoutonSouris() == GaucheRelache && whenReleasedUI(buttons,nButtons,sliders,nSliders) == TogglePause) pause = !pause;
 			//Zoom : Calcul du déplacement sur la grille
 			if(NeedScrollUpdate){
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
@@ -169,13 +240,15 @@ void gestionEvenement(EvenementGfx evenement)
 				DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
 				DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
 				if(DeltaX < 0) DeltaX = 0;
-				if(DeltaX + WcellCap >= DataSizeX) DeltaX = DataSizeX - WcellCap;
+				if(DeltaX + WcellCap + 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap - 1;
 				if(DeltaY < 0) DeltaY = 0;
-				if(DeltaY + HcellCap >= DataSizeY) DeltaY = DataSizeY - HcellCap;
+				if(DeltaY + HcellCap + 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap - 1;
 			}
 
+			whenHoverUI(buttons, nButtons,sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 			rafraichisFenetre();
 			break;
+
 		case Souris:
 			//Drag&Snap quand le clic droit est maintenu
 			if(RCD){
@@ -184,14 +257,18 @@ void gestionEvenement(EvenementGfx evenement)
 				XDRC = abscisseSouris() / (CellSize + CellInBetween);
 				YDRC = ordonneeSouris() / (CellSize + CellInBetween);
 				if(DeltaX < 0) DeltaX = 0;
-				if(DeltaX + WcellCap - 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap;
+				if(DeltaX + WcellCap + 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap - 1;
 				if(DeltaY < 0) DeltaY = 0;
-				if(DeltaY + HcellCap - 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap;
+				if(DeltaY + HcellCap + 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap - 1;
 			}
 			break;
 		case Clavier:
 			//Système Start/Stop (initialement stop)
-			if(caractereClavier() == 32) pause = !pause;
+			if(caractereClavier() == 32){
+				pause = !pause;
+				buttons[1].TogggleStatus = pause;
+				buttons[1].state = buttons[1].TogggleStatus ? Clicked : Idle;
+			}
 			break;
 		case Redimensionnement:
 			//Mise à jour de la fenêtre

@@ -52,7 +52,7 @@ button newButton(coord2D centerPoint, int width, int height, color RGBIdle, colo
     new.action = action;
     new.IsToggleButton = IsToggleButton;
     new.TogggleStatus = TogggleStatus;
-    new.state = Idle;
+    new.state = TogggleStatus ? Clicked : Idle;
     return new;
 }
 

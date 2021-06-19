@@ -56,3 +56,16 @@ int getAliveNeyboors(int **tab, int x, int y, int xmax, int ymax){
 	}
 	return (AN-tab[y][x]);
 }
+
+int Vivant(int **CellData,int MW, int MH)
+{
+	int vivant=0;
+	for(int x = 0; x<MH; x++) {
+		for(int y = 0; y<MW; y++)
+		{
+			if(CellData[x][y]==1){vivant++;
+			}
+		}
+	}
+	return vivant;
+}
