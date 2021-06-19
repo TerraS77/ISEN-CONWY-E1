@@ -51,7 +51,7 @@ void gestionEvenement(EvenementGfx evenement)
 	//Menu Elements
 	static bool pause = true;
 	static int MenuWidth = 290;
-	static bool MenuStatus = true;
+	static bool MenuStatus = false;
 	static DonneesImageRGB *header = NULL;
 	static button *buttons = NULL;
 	static slider *sliders = NULL;
