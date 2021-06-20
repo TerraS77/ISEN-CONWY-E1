@@ -1,13 +1,16 @@
 #include <stdlib.h> // Pour pouvoir utiliser exit()
 #include <stdio.h> // Pour pouvoir utiliser printf()
+#include <stdbool.h>
 #include <math.h> // Pour pouvoir utiliser sin() et cos()
 #include <string.h>
 #include <dirent.h>
+#include <assert.h>
+#include <time.h>
 #include "../GfxLib/GfxLib.h" // Seul cet include est necessaire pour faire du graphique
 #include "../GfxLib/BmpLib.h" // Cet include permet de manipuler des fichiers BMP
 #include "../GfxLib/ESLib.h" // Pour utiliser valeurAleatoire()
 #include "../ConwayEngine/ConwayEngine.h"
-#include "../SmartUI/SmartUI.h"
+//#include "../SmartUI/SmartUI.h"
 
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
 #define LargeurFenetre 1200
@@ -16,8 +19,6 @@
 #define MATRIX_W 1000
 
 void gestionEvenement(EvenementGfx evenement);
-void iniCellData(int ***tab, int DataSizeX, int DataSizeY);
-void freeCellData(int ***tab, int W, int H);
 
 int main(int argc, char **argv)
 {
@@ -32,8 +33,15 @@ void gestionEvenement(EvenementGfx evenement)
 	//Matrice de données
 	static int DataSizeX = MATRIX_W;
 	static int DataSizeY = MATRIX_H;
-	static int **CellData = NULL;
+	static cell **CellData = NULL;
 	static int tickCount = 0;
+
+	//BLOB
+	static blob_blob *blobs = NULL;
+	static int blobNumber = 0;
+
+	//SIM
+	static simulation sim;
 
 	//Drag&Snap et Zoom
 	static int DeltaX = 0;
@@ -68,11 +76,11 @@ void gestionEvenement(EvenementGfx evenement)
 	static int tick = 0;
 	static int rotation=0;
 	
-
-
 	switch (evenement){
 		case Initialisation:
 			;
+			srand(time(NULL));
+
 			//Menu
 			header = lisBMPRGB("#Ressources/header.bmp");
 			color RGBIdle = newColor(45,45,48);
@@ -111,7 +119,19 @@ void gestionEvenement(EvenementGfx evenement)
 			iniCellData(&CellData, DataSizeX, DataSizeY);
 			DeltaX = DataSizeX/4;
 			DeltaY = DataSizeY/4;
+
+			//BLOB
+			blobs = (blob_blob*) malloc(sizeof(blob_blob));
 			demandeTemporisation(20);
+
+			//SIM
+			sim.AtracFoodMultiplicator = 1;
+			sim.detectionRadius = 3;
+			sim.OscilInfluence = 0.5;
+			sim.ramificationRarity = 20;
+			sim.RepMucusMultiplicator = 1;
+			sim.RepSelfMultiplicator = 0.5;
+			sim.RepWallMultiplicator = 1;
         break;
 		
 		case Temporisation: ;
@@ -130,22 +150,17 @@ void gestionEvenement(EvenementGfx evenement)
 				tick++;
 				if(tick>=seuil) tick = 0;
 				if(tick==0){
-					conwayTransform(CellData, DataSizeX, DataSizeY);
+					//conwayTransform(CellData, DataSizeX, DataSizeY);
 					gen++;
 				} 
 			}
 
 			//Menu
-
-			if(MenuStatus==true && MenuWidth<290) 
-			MenuWidth+=50;
-
-			else if (MenuStatus==false && MenuWidth>0)
-			 MenuWidth-=50;
-			
+			if(MenuStatus==true && MenuWidth<290) MenuWidth+=50;
+			else if (MenuStatus==false && MenuWidth>0) MenuWidth-=50;
 			
 			if(MenuWidth>0){
-				vivant = Vivant(CellData,DataSizeX,DataSizeY);
+				vivant = 0;
 				char string[64];
 				sprintf(string,"Cellules: %d",vivant);
 				texts[2]=newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 180),string, 2);
@@ -165,23 +180,19 @@ void gestionEvenement(EvenementGfx evenement)
 				char string5[25];
 				sprintf(string5,"Vitesse : %d",sliders->value);
 				texts[6] =newText(newColor(255,255,255),newColor(255,255,255),newColor(255,255,255), 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 350),string5, 2);
-
 				whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()));
 				updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50));
 				updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80));
-				
 				updateText(&texts[7],new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 450));
 				updateSlider(&sliders[0],new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 400));
 				updateButton(&buttons[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150,hauteurFenetre() - 760)));
 				updateButton(&buttons[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90,hauteurFenetre() - 700)));
 				updateButton(&buttons[2], (new2Dcoord(largeurFenetre() - MenuWidth + 200,hauteurFenetre() - 700)));
-				
-
 			}
 			updateButton(&buttons[3], ((new2Dcoord(largeurFenetre() - MenuWidth -50,hauteurFenetre() - 45))));
-			
-
-
+			if(!pause){
+				for(int i = 0; i < blobNumber; i++) blobNewRound(CellData, DataSizeX, DataSizeY, &blobs[i], &blobNumber, sim);
+			}
 			rafraichisFenetre();
 			break;
 		 
@@ -194,8 +205,9 @@ void gestionEvenement(EvenementGfx evenement)
 					int LBCy = (y + 1) * (CellSize + CellInBetween) - (DeltaY * (CellSize + CellInBetween));
 					int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
 					int RTCy = y * (CellSize + CellInBetween) + CellInBetween - (DeltaY * (CellSize + CellInBetween));
-					CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(255, 255, 255);
-					if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+					int colorGrad = CellData[y][x].blob_bm > 230 ? 230 : CellData[y][x].blob_bm;
+					CellData[y][x].blob_bm == 0 ? couleurCourante(20, 20, 20) : couleurCourante(colorGrad + 20, colorGrad + 20, 20);
+					if(CellData[y][x].blob_bm > 0 || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 				}
 			}
 			couleurCourante(28, 28, 28);
@@ -206,42 +218,12 @@ void gestionEvenement(EvenementGfx evenement)
 				printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
 			}
 
-			if( MenuWidth==290) {				
-			
-			couleurCourante(255, 255, 255);
-			triangle(largeurFenetre() - MenuWidth -30,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45);
-			triangle(largeurFenetre() - MenuWidth -30,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);
-			}
-			else if (MenuWidth>200 && MenuWidth<290)
-			{
-				couleurCourante(255, 255, 255);
-			triangle(largeurFenetre() - MenuWidth -40,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45);
-			triangle(largeurFenetre() - MenuWidth -40,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);
-			}
-			
-			
-			
-			else if( MenuWidth>150 && MenuWidth<200) 
-			{
-				couleurCourante(255, 255, 255);
-			triangle(largeurFenetre() - MenuWidth -80,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45);
-			triangle(largeurFenetre() - MenuWidth -80,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);
-
-			}
-			else if( MenuWidth>75 && MenuWidth<150) 
-			{
-			couleurCourante(255, 255, 255);
-			 triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -35, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -45, hauteurFenetre() - 45);
-			triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -45, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -35, hauteurFenetre() - 70);
-
-			}
-			 else {
-			couleurCourante(255, 255, 255);
-			 triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -30, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45);
-			triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -30, hauteurFenetre() - 70);
-						}
+			if( MenuWidth==290){couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth -30,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth -30,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);}
+			else if (MenuWidth>200 && MenuWidth<290){couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth -40,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth -40,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);}
+			else if( MenuWidth>150 && MenuWidth<200){couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth -80,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth -80,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -60, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -70, hauteurFenetre() - 70);}
+			else if( MenuWidth>75 && MenuWidth<150){couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -35, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -45, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -45, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -35, hauteurFenetre() - 70);} 
+			else {couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -30, hauteurFenetre() - 20, largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth -70,  hauteurFenetre() - 45,largeurFenetre() - MenuWidth -50, hauteurFenetre() - 45, largeurFenetre() - MenuWidth -30, hauteurFenetre() - 70);}
 						
-
 			//Menu
 			break;
 
@@ -249,15 +231,20 @@ void gestionEvenement(EvenementGfx evenement)
 			; //Aproximation de la position de la souris sur la grille
 			float fx = abscisseSouris() / (CellSize + CellInBetween);
 			float fy = ordonneeSouris() / (CellSize + CellInBetween);
-
 			if (etatBoutonSouris() == GaucheAppuye){
 				//Indentification de la ceullule cible
 				int Sx = floorf(fx) + DeltaX;
 				int Sy = floorf(fy) + DeltaY;
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
 				if(((largeurFenetre() - MenuWidth -70< abscisseSouris()) &&	((hauteurFenetre() - 70)<ordonneeSouris())));
-				else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre())   )
-					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)) CellData[Sy][Sx] = !CellData[Sy][Sx];
+				else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
+					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
+						//CellData[Sy][Sx] = !CellData[Sy][Sx];
+						blobNumber++;
+						blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
+						blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);
+						newAnt(&blobs[blobNumber-1].ants, &blobs[blobNumber-1].nAnts, new2Dcoord(Sx,Sy), -2, -2, 500, 50, blobs[blobNumber-1].id, 20);
+				}
 			}
 
 			//Zoom : IN & OUT (ScrollUp et ScrollDown addons pour gfxlib)
@@ -294,8 +281,7 @@ void gestionEvenement(EvenementGfx evenement)
 						exit(EXIT_SUCCESS);
 						break;
 					case MENU :
-						
-				MenuStatus=!MenuStatus;
+						MenuStatus = !MenuStatus;
 						break;
 				}
 			}
@@ -338,8 +324,6 @@ void gestionEvenement(EvenementGfx evenement)
 				buttons[1].state = buttons[1].TogggleStatus ? Clicked : Idle;
 			}
 			
-				
-			
 			break;
 		case Redimensionnement:
 			//Mise à jour de la fenêtre
@@ -348,29 +332,4 @@ void gestionEvenement(EvenementGfx evenement)
 			rafraichisFenetre();
 			break;
 	}
-}
-
-//Allocation dynamique et initialisation à 0 de la matrice
-void iniCellData(int ***tab, int W, int H){
-	*tab = (int**) malloc(sizeof(int*)*H);
-	if(*tab == NULL){
-		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCellData 1:0)");
-		exit(EXIT_FAILURE);
-	}
-	for(int y = 0; y<H; y++){
-		(*tab)[y] = (int*) malloc(sizeof(int)*W);
-		if((*tab)[y] == NULL){
-			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniCellData 2:%d)", y);
-			for(int Y = 0; Y<y; Y++) free((*tab)[Y]);
-			free(*tab);
-			exit(EXIT_FAILURE);
-		}
-	}
-	for(int x = 0; x<W; x++) for(int y = 0; y<H; y++) (*tab)[y][x] = 0;
-}
-
-//Libération de la mémoire
-void freeCellData(int ***tab, int W, int H){
-	for(int y = 0; y<H; y++) free((*tab)[y]);
-	free(*tab);
 }

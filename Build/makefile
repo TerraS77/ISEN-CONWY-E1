@@ -16,14 +16,14 @@ conwayApp: $(B_SG)/SmartGrid.o $(B_GFX)/libisentlib.a  $(B_SU)/SmartUI.o $(B_CE)
 	mv SmartUI.o $(B_SU)/
 	gcc -Wall $(B_SG)/SmartGrid.o -o conwayApp $(B_GFX)/libisentlib.a $(B_SU)/SmartUI.o $(B_CE)/ConwayEngine.o -lm -lglut -lGL -lX11
 
-$(B_CE)/ConwayEngine.o: $(S_CE)/ConwayEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h
+$(B_CE)/ConwayEngine.o: $(S_CE)/ConwayEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
 	gcc -Wall -c $(S_CE)/ConwayEngine.c
 
-$(B_SG)/SmartGrid.o: $(S_SG)/SmartGrid.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_CE)/ConwayEngine.h $(S_SU)/SmartUI.h
-	gcc -Wall -c $(S_SG)/SmartGrid.c
+$(B_SG)/SmartGrid.o: $(S_SG)/SmartGrid.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h $(S_CE)/ConwayEngine.h
+	gcc -Wall  -c $(S_SG)/SmartGrid.c
 
 $(B_SU)/SmartUI.o: $(S_SU)/SmartUI.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
-	gcc -Wall -c $(S_SU)/SmartUI.c
+	gcc -Wall  -c $(S_SU)/SmartUI.c
 
 $(B_GFX)/libisentlib.a: $(B_GFX)/BmpLib.o $(B_GFX)/ErreurLib.o $(B_GFX)/ESLib.o $(B_GFX)/GfxLib.o $(B_GFX)/OutilsLib.o $(B_GFX)/VectorLib.o
 	mv BmpLib.o $(B_GFX)/

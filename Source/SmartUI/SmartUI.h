@@ -1,3 +1,4 @@
+#include <stdbool.h>
 typedef enum {Idle, Hover, Clicked, Hiden} status;
 typedef enum {none, UpdateSpeed, TogglePause, Leave, RESET,MENU} action;
 

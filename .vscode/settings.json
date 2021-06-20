@@ -2,6 +2,8 @@
     "C_Cpp.errorSquiggles": "Disabled",
     "files.associations": {
         "gfxlib.h": "c",
-        "bmplib.h": "c"
+        "bmplib.h": "c",
+        "conwayengine.h": "c",
+        "smartui.h": "c"
     }
 }

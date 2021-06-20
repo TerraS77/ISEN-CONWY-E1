@@ -1,5 +1,10 @@
-typedef enum{empty, block, food, blob, fb}cellType;
-typedef enum{none, food, kernel, vein, plasma}blob_cellType;
+typedef enum{cell_empty, cell_block, cell_food, cell_blob, cell_mucus}cellType;
+typedef enum{blob_none, blob_harvest, blob_kernel, blob_vein, blob_plasma}blob_cellType;
+
+typedef struct{
+    float x;
+    float y;
+}vector;
 
 typedef struct{
     cellType type;
@@ -8,75 +13,57 @@ typedef struct{
     int blob_id;
     int blob_ttl;
     int blob_bm;
-    int blob_nutr;
+    int mucus_amount;
+    int blob_oscillation;
     color color;
 }cell;
 
 typedef struct{
-    coord2D coord2D;
+    bool dead;
+    vector moov;
     float x;
     float y;
-    float vector.x;
-    float vector.y;
-    coord2D *path;
     int t;
     int ttl;
-}blob_agent;
-
-typedef struct{
-    cellType type;
-    int food_amount;
-    blob_cellType blob_type;
-    int blob_id;
-    int blob_ttl;
-    int blob_bm;
-    int blob_nutr;
-    int blob_request_bm;
-    int blob_request_nutr;
-    coord2D coord2D;
-}blob_cell;
+    float oscillation;
+}ant;
 
 typedef struct{
     int id;
-    blob_cell *cells;
+    coord2D *cells;
     int totalCells;
-    int harvest_totalFood;
-    int harvest_foodPR;
-    int stock_totalNutr;
-    int stock_nutrPR;
-    int biomass_totalBiomass;
-    int biomass_biomassPR;
-    blob_agent *agents;
-    int nAgents;
-    float isExpanding;
+    ant *ants;
+    int nAnts;
+    bool isExpanding;
 }blob_blob;
 
 typedef struct{
-    float TranCap; //Multip. de transport par unité de biomasse
-    float nutrCons; //Multip. de consomation de nutriments par unitées de biomasse
-    float VeinCap; //Multip. Capacitée de transport des corps veneux
-    float nutrMinStock; //Multip. stock déclancheur d'un expand
-    float CroitFood; //Multip. de seuil de dévellopement pour les cellules d'exploitations
-    float food_SpeedExp; //Multip de la vitesse de croissance des cellules food
-    float kernel_SpeedExp; //Multip de la vitesse de croissance des cellules kernel
-    float vein_SpeedExp; //Multip de la vitesse de croissance des cellules vein
-    int FoodHarvest; //Unités de nourriture exploitable par unitées de biomasse
-    int TranSpeed; //Nombre d'itérations de transport par tours
-    int SeuilCredit; //Seuil d'endettement pouvant causer la mort d'une entitée.
-    int TTLCredit; //Nombre de tours qu'une cellule peut passée en dépassant le seuil.
-    int StockCap; //Nombre d'unité de nutriments stockables par unitées de biomasses.
+    int ramificationRarity;
+    int detectionRadius;
+    float RepMucusMultiplicator;
+    float RepWallMultiplicator;
+    float RepSelfMultiplicator;
+    float AtracFoodMultiplicator;
+    float OscilInfluence;
 }simulation;
 
 //BLOB
-blob_blob newBlob(cell **cellGrid, int CW, int CH, int *BN, coord2D SP, int ttf, int ttnutr, int ttbio, simulation sim);
-blob_cell newBlobCell(cell **cellGrid, cellType type, int food, blob_cellType blob_type, int id, int ttl, int bm, int nutr, coord2D spawn);
 
-cell newCell(cellType type, int food_amount, blob_cellType blob_type, int blob_id, int blob_ttl, int blob_bm, int blob_nutr);
-cell newEmptyCell();
+void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim);
 
-void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *blob_target, simulation sim);
-void blobUpdateStats(blob *target_blob, simulation sim);
-void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
-void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
-int getNeyboorsByType(cell **cellGrid, int CW, int CH, coord2D target, cellType type);
+// void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
+// void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
+
+blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim);
 int newBlobID();
+cell newEmptyCell();
+cell newCell(cellType type, int food_amount, int blob_bm, int mucus_amount);
+cell newBlobCell(cell **cellGrid, int food, blob_cellType blob_type, int id, int ttl, int bm, int mucus_amount, coord2D spawn, float oscillation);
+void newAnt(ant **tab, int *tabSize, coord2D coords, float Vx, float Vy, int ttl, float oscillation);
+void vectorGeneratorRand(float *Vx, float *Vy, int speed);
+int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
+vector getOscilatorVect(cell **cellGrid, int CW, int CH, coord2D target, float targetOscillation, int id);
+vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
+vector crunchSpeed(vector vect, int speed);
+void iniCellData(cell ***tab, int W, int H);
+void freeCellData(cell ***tab, int W, int H);
