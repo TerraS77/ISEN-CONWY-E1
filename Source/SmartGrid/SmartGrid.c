@@ -16,14 +16,11 @@
 #define HauteurFenetre 800
 #define MATRIX_H 500
 #define MATRIX_W 1000
+int mode = 0;
 
 void gestionEvenement(EvenementGfx evenement);
 void iniCellData(int ***tab, int DataSizeX, int DataSizeY);
 void freeCellData(int ***tab, int W, int H);
-
-void maze(int ***tab);
-//void save(int **tab, int W, int H);
-//void load(int **tab, int W, int H, int mode);
 
 void iniColors(color ***tab, int W, int H);
 void freeColors(color ***tab, int W, int H);
@@ -31,8 +28,15 @@ void save(int **tabCell, int W, int H, color **tabCol);
 void load(int **tabCell, int W, int H, color **tabCol, int mode);
 void initRandom(int **tabCell, int W, int H, color **tabCol);
 
+void loadBMP(int **tabCell, color **tabCol);
+void saveBMP(int **tabCell, int W, int H, color **tabCol);
+
 int main(int argc, char **argv)
-{
+{	
+	if(argc == 2){
+		if(*argv[1] =='1') mode = 1;
+		else mode = 0;
+	}
 	initialiseGfx(argc, argv);
 	prepareFenetreGraphique("SMART GRID", LargeurFenetre, HauteurFenetre);
 	lanceBoucleEvenements();
@@ -73,7 +77,7 @@ void gestionEvenement(EvenementGfx evenement)
 	static int nTexts = 0;
 	static unsigned long int generationNumber = 0;
 
-	static int mode = 1;
+	//static int mode = 1;
 	static float fx;
 	static float fy;
 	static int Sx;
@@ -83,6 +87,16 @@ void gestionEvenement(EvenementGfx evenement)
 	static int H_temp;
 
 	static color **Colors;
+	
+	color green = newColor(81,255,118);
+	color yellow = newColor(0,250,250);
+	color red = newColor(195,0,28);
+	color grey = newColor(20, 20, 20);
+	color dark = newColor(20, 20, 20);
+	color background = newColor(70,70,70);
+	color color_button = background;
+
+	static int border = 3;
 
 
 	switch (mode){
@@ -100,15 +114,7 @@ void gestionEvenement(EvenementGfx evenement)
 			//load(CellData, 21, 21, mode);
 			load(CellData, DataSizeX, DataSizeY, Colors, mode);
 
-			color green = newColor(81,255,118);
-			color yellow = newColor(255,250,54);
-			color red = newColor(195,0,28);
-			color grey = newColor(20, 20, 20);
-			color dark = newColor(20, 20, 20);
-			color background = newColor(255,250,242);
-			color color_button = background;
-
-			nButtons = 9;
+			nButtons = 13;
 			buttons = malloc(sizeof(button)*nButtons);
 			buttons[0] = newButton(
 				new2Dcoord(0, 0), 
@@ -161,7 +167,29 @@ void gestionEvenement(EvenementGfx evenement)
 				W_temp, 40, background, background, background, 
 				newText(red, red, red, 50, 
 				new2Dcoord(largeurFenetre() * 0.5,  hauteurFenetre() * 0.90),"MENU", 5), 
+				menu0, false, false);
+
+			buttons[9] = newButton(
+				new2Dcoord(0, 0), 
+				W_temp + border, H_temp + border,color_button, color_button, color_button, 
+				newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 35, new2Dcoord(0,0),"", 1), 
 				menu1, false, false);
+			buttons[10] = newButton(
+				new2Dcoord(0, 0), 
+				W_temp + border, H_temp + border, color_button, color_button, color_button, 
+				newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 35, new2Dcoord(0,0),"", 1), 
+				menu2, false, false);
+			buttons[11] = newButton(
+				new2Dcoord(0, 0), 
+				W_temp + border, H_temp + border, color_button, color_button, color_button, 
+				newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 35, new2Dcoord(0,0),"", 1), 
+				menu3, false, false);
+			buttons[12] = newButton(
+				new2Dcoord(0, 0), 
+				W_temp + border, H_temp + border, color_button, color_button, color_button, 
+				newText(newColor(255,255,255), newColor(255,255,255), newColor(255,255,255), 35, new2Dcoord(0,0),"", 1), 
+				menu4, false, false);
+
 			demandeTemporisation(30);
 			break;
 
@@ -179,11 +207,100 @@ void gestionEvenement(EvenementGfx evenement)
 			updateButton(&buttons[7], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween - H_temp/2 - buttons[7].height/2));
 			
 			updateButton(&buttons[8], new2Dcoord(largeurFenetre() * 0.5, hauteurFenetre() * 0.90));
+
+			updateButton(&buttons[9], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween));
+			updateButton(&buttons[10], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween));
+			updateButton(&buttons[11], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween));
+			updateButton(&buttons[12], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween));
+
+
+			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()));
+			for (int i = 0; i < nButtons; i++){
+				if(buttons[i].state == 1){
+					switch (i){
+					case 0:
+					case 4:
+						buttons[9].RGBIdle = yellow;
+						buttons[9].RGBhover = yellow;
+						buttons[9].RGBclick = yellow;
+						buttons[0].state = 1;
+						buttons[4].state = 1;
+						break;
+					
+					case 1:
+					case 5:
+						buttons[10].RGBIdle = yellow;
+						buttons[10].RGBhover = yellow;
+						buttons[10].RGBclick = yellow;
+						buttons[1].state = 1;
+						buttons[5].state = 1;
+						break;
+						
+					case 2:
+					case 6:
+						buttons[11].RGBIdle = yellow;
+						buttons[11].RGBhover = yellow;
+						buttons[11].RGBclick = yellow;
+						buttons[2].state = 1;
+						buttons[6].state = 1;
+						break;
+						
+					case 3:
+					case 7:
+						buttons[12].RGBIdle = yellow;
+						buttons[12].RGBhover = yellow;
+						buttons[12].RGBclick = yellow;
+						buttons[3].state = 1;
+						buttons[7].state = 1;
+						break;
+
+					default:
+						break;
+					}
+					
+				}
+				if(buttons[i].state != 1){
+					switch (i){
+					case 0:
+					case 4:
+						buttons[9].RGBIdle = background;
+						buttons[9].RGBhover = background;
+						buttons[9].RGBclick = background;
+						break;
+					
+					case 1:
+					case 5:
+						buttons[10].RGBIdle = background;
+						buttons[10].RGBhover = background;
+						buttons[10].RGBclick = background;
+						break;
+						
+					case 2:
+					case 6:
+						buttons[11].RGBIdle = background;
+						buttons[11].RGBhover = background;
+						buttons[11].RGBclick = background;
+						break;
+						
+					case 3:
+					case 7:
+						buttons[12].RGBIdle = background;
+						buttons[12].RGBhover = background;
+						buttons[12].RGBclick = background;
+						break;
+
+					default:
+						break;
+					}
+					
+				}
+			}
+			
 			rafraichisFenetre();
 			break;
 		
 		case Affichage:
-			effaceFenetre(255,250,242);
+			effaceFenetre(70,70,70);
 			printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
 			for (int i = 0; i < 2; i++){
 				for (int j = 0; j < 2; j++){
@@ -199,11 +316,21 @@ void gestionEvenement(EvenementGfx evenement)
 					}
 				}
 			}
+			couleurCourante(255,0,0);
+			cercleBis(largeurFenetre()-40, hauteurFenetre()-40, 28);
+			sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255,0,0) : couleurCourante(255, 255, 255);
+			
+			cercleBis(largeurFenetre()-40, hauteurFenetre()-40, 26);
+			sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255, 255, 255) : couleurCourante(255,0,0);
+			epaisseurDeTrait(4);
+			ligne(largeurFenetre()-54, hauteurFenetre()-54, largeurFenetre()-26, hauteurFenetre()-26);
+			ligne(largeurFenetre()-26, hauteurFenetre()-54, largeurFenetre()-54, hauteurFenetre()-26);
+
 			break;
 
 		case BoutonSouris:
 			if (etatBoutonSouris() == GaucheAppuye){
-				switch (whenClickedUI(buttons, 9, sliders, 0, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
+				switch (whenClickedUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
 				case menu1:
 					printf("Menu1\n");
 					break;
@@ -220,6 +347,13 @@ void gestionEvenement(EvenementGfx evenement)
 				default:
 					break;
 				}
+				if (sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 30){
+					printf("Quitter\n");
+					freeCellData(&CellData, DataSizeX, DataSizeY);
+					freeColors(&Colors, DataSizeX, DataSizeY);
+					termineBoucleEvenements();
+				}
+				
 			}
 			rafraichisFenetre();
 			break;
@@ -322,7 +456,6 @@ void gestionEvenement(EvenementGfx evenement)
 				if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)) {
 					CellData[Sy][Sx] = !CellData[Sy][Sx];
-					printf("%d\n", CellData[Sy][Sx]);
 					if (CellData[Sy][Sy] != 1){
 						Colors[Sy][Sx].R = 255;
 						Colors[Sy][Sx].G = 255;
@@ -333,7 +466,6 @@ void gestionEvenement(EvenementGfx evenement)
 						Colors[Sy][Sx].G = 20;
 						Colors[Sy][Sx].B = 20;
 					}
-					printf("%d:%d:%d\n", Colors[Sy][Sx].R, Colors[Sy][Sx].G, Colors[Sy][Sx].B);
 				}
 			}
 
@@ -390,11 +522,17 @@ void gestionEvenement(EvenementGfx evenement)
 			switch (caractereClavier()){
 			case 32:
 				pause = !pause;
+				printf("H : %d\nW : %d\n", HcellCap, WcellCap);
 				break;
 
 			case 'a':
 			case 'A':
-				maze(&CellData);
+				saveBMP(CellData, DataSizeX, DataSizeY, Colors);
+				break;
+
+			case 'c':
+			case 'C':
+				CellInBetween = !CellInBetween;
 				break;
 
 			case 'l':
@@ -424,6 +562,11 @@ void gestionEvenement(EvenementGfx evenement)
 			case 'w':
 			case 'W':
 				initRandom(CellData, DataSizeX, DataSizeY, Colors);
+				break;
+
+			case 'z':
+			case 'Z':
+				loadBMP(CellData, Colors);
 				break;
 			}
 			break;
@@ -471,20 +614,6 @@ void freeColors(color ***tab, int W, int H){
 	free(*tab);
 }
 
-void maze(int ***tab){
-	int taille = 499;
-	for(int  i = 0; i < taille; i++){
-		for (int j = 0; j < taille; j++){
-			//if(i == 0 || i == taille -1 || j == 0 || j == taille - 1) (*tab)[i][j] = 1;
-			if(i % 2 != 1 || j == 0 || j == taille - 1 || j % 2 == 0) (*tab)[i][j] = 1;
-			else (*tab)[i][j] = 0;
-		}
-	}
-	(*tab)[taille - 2][0] = 0;
-	(*tab)[1][taille - 1] = 0;
-}
-
-
 //Allocation dynamique et initialisation à 0 de la matrice
 void iniColors(color ***tab, int W, int H){
 	*tab = (color**) malloc(sizeof(color*)*H);
@@ -509,7 +638,9 @@ void save(int **tabCell, int W, int H, color **tabCol){
 	char name[20];
     char source[40] = "./#Ressources/";
 
-    printf("SAVE ENGINE - Nom de votre fichier : ");
+	system("clear");
+	system("ls ./#Ressources/*.cnw --format=single-column | cut -c 15- ");
+    printf("SAVE CNW - Nom de votre fichier : ");
     scanf("%s", name);
     strcat(source,name);
     strcat(source,".cnw");
@@ -518,7 +649,7 @@ void save(int **tabCell, int W, int H, color **tabCol){
 	for (int i = 0; i < H; i++){
 		for (int j = 0; j < W; j++){
 			if(tabCell[i][j] == 1){
-				printf("{%d;%d}%d/%d/%d;\n", i, j, tabCol[i][j].R, tabCol[i][j].G, tabCol[i][j].B);
+				//printf("{%d;%d}%d/%d/%d;\n", i, j, tabCol[i][j].R, tabCol[i][j].G, tabCol[i][j].B);
 				fprintf(fic, "{%d;%d}%d/%d/%d;\n", i, j, tabCol[i][j].R, tabCol[i][j].G, tabCol[i][j].B);
 			}
 		}
@@ -543,11 +674,11 @@ void load(int **tabCell, int W, int H, color **tabCol, int mode){
 		system("clear");
 		system("ls ./#Ressources/*.cnw --format=single-column | cut -c 15- ");
 		
-		printf("LOAD ENGINE - Nom de votre fichier : ");
+		printf("LOAD CNW - Nom de votre fichier : ");
 		scanf("%s", name);
 		strcat(source, name);
 	}
-	else strcat(source, "baptiste2");
+	else strcat(source, "baptiste");
 
 	strcat(source,".cnw");
 	fic = fopen(source, "r");
@@ -583,4 +714,70 @@ void initRandom(int **tabCell, int W, int H, color **tabCol){
 			}
 		}
 	}
+}
+
+void loadBMP(int **tabCell, color **tabCol){
+	char name[20];
+    char source[40] = "./#Ressources/";
+
+	system("clear");
+	system("ls ./#Ressources/*.bmp --format=single-column | cut -c 15- ");
+    printf("LOAD BMP - Nom de votre fichier : ");
+    scanf("%s", name);
+    strcat(name, ".bmp");
+    strcat(source, name);
+
+	static DonneesImageRGB *image = NULL;
+	image = lisBMPRGB(source);
+
+	//printf("Largeur : %d\n", image->largeurImage);
+	//printf("Largeur : %d\n", image->hauteurImage);
+
+    for(int i=0;i<image->hauteurImage;i++){
+        for(int j=0;j<image->largeurImage;j++){
+			tabCol[i][j].R = image->donneesRGB[(j+i*image->hauteurImage)*3+2];
+			tabCol[i][j].G = image->donneesRGB[(j+i*image->hauteurImage)*3+1];
+			tabCol[i][j].B = image->donneesRGB[(j+i*image->hauteurImage)*3];
+			tabCell[i][j] = 1;
+        }
+    }
+	libereDonneesImageRGB(&image);
+	printf("Le fichier %s a ete charge ! \n", name);
+}
+
+void saveBMP(int **tabCell, int W, int H, color **tabCol){
+	char name[20];
+    char source[40] = "./#Ressources/";
+
+	system("clear");
+	system("ls ./#Ressources/*.bmp --format=single-column | cut -c 15- ");
+    printf("SAVE BMP - Nom de votre fichier : ");
+    scanf("%s", name);
+    strcat(name, ".bmp");
+    strcat(source, name);
+
+	
+	static DonneesImageRGB *image = NULL;
+	image = lisBMPRGB("./#Ressources/matrice.bmp");
+
+	H = image->hauteurImage;
+	W = image->largeurImage;
+
+	for (int i = 0; i < H; i++){
+		for (int j = 0; j < W; j++){
+			if(tabCell[i][j] == 1){
+				image->donneesRGB[(j+i*image->hauteurImage)*3+2] = tabCol[i][j].R;
+				image->donneesRGB[(j+i*image->hauteurImage)*3+1] = tabCol[i][j].G;
+				image->donneesRGB[(j+i*image->hauteurImage)*3] = tabCol[i][j].B;
+			}
+			else {
+				image->donneesRGB[(j+i*image->hauteurImage)*3+2] = 0;
+				image->donneesRGB[(j+i*image->hauteurImage)*3+1] = 0;
+				image->donneesRGB[(j+i*image->hauteurImage)*3] = 0;
+			}
+		}
+	}
+	ecrisBMPRGB_Dans(image, source);
+	libereDonneesImageRGB(&image);
+	printf("Le fichier %s a ete enregistre ! \n", name);
 }

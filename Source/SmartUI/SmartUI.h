@@ -1,5 +1,5 @@
 typedef enum {Idle, Hover, Clicked, Hiden} status;
-typedef enum {none, menu1, menu2, menu3, menu4} action;
+typedef enum {none, menu0, menu1, menu2, menu3, menu4} action;
 
 typedef struct{
     int x;
@@ -68,3 +68,5 @@ void whenHoverUI(button buttons[], int arraySize, slider sliders[], int arraySiz
 void updateButton(button *b, coord2D centerPoint);
 void updateSlider(slider *s, coord2D centerPoint);
 void updateText(text *t, coord2D position);
+
+void cercleBis(float centreX, float centreY, float rayon);
