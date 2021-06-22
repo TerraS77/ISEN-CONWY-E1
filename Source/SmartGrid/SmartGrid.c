@@ -39,6 +39,7 @@ void gestionEvenement(EvenementGfx evenement)
 	//BLOB
 	static blob_blob *blobs = NULL;
 	static int blobNumber = 0;
+	static int selection = 'b';
 
 	//SIM
 	static simulation sim;
@@ -94,12 +95,12 @@ void gestionEvenement(EvenementGfx evenement)
 			texts = malloc(sizeof(text)*nTexts);
 			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "CONWAY'S", 4);
 			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80), "Game of Life", 2);
-			texts[2]=newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 180),"Vivant: 0", 2);
-			texts[3] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 225),"Generation : 0", 2);
-			texts[4] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 270),"X:", 2);
-			texts[5] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +150,hauteurFenetre() - 270),"Y:", 2);
-			texts[6] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 350),"Vitesse :", 2);
-			texts[7] =newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 450),"0        200", 2);
+			texts[2] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 180),"Vivant: 0", 2);
+			texts[3] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 225),"Generation : 0", 2);
+			texts[4] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 270),"X:", 2);
+			texts[5] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +150,hauteurFenetre() - 270),"Y:", 2);
+			texts[6] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 350),"Vitesse :", 2);
+			texts[7] = newText(RGBwhite,RGBwhite,RGBwhite, 25,new2Dcoord(largeurFenetre()-MenuWidth +30,hauteurFenetre() - 450),"0        200", 2);
 			
 			//SLIDER
 			nSliders = 1;
@@ -126,7 +127,7 @@ void gestionEvenement(EvenementGfx evenement)
 
 			//SIM
 			sim.AtracFoodMultiplicator = 1;
-			sim.detectionRadius = 3;
+			sim.detectionRadius = 10;
 			sim.OscilInfluence = 0.5;
 			sim.ramificationRarity = 20;
 			sim.RepMucusMultiplicator = 1;
@@ -206,8 +207,9 @@ void gestionEvenement(EvenementGfx evenement)
 					int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
 					int RTCy = y * (CellSize + CellInBetween) + CellInBetween - (DeltaY * (CellSize + CellInBetween));
 					int colorGrad = CellData[y][x].blob_bm > 230 ? 230 : CellData[y][x].blob_bm;
-					CellData[y][x].blob_bm == 0 ? couleurCourante(20, 20, 20) : couleurCourante(colorGrad + 20, colorGrad + 20, 20);
-					if(CellData[y][x].blob_bm > 0 || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+					CellData[y][x].blob_bm < 0 ? couleurCourante(20, 20, 20) : couleurCourante(colorGrad + 20, colorGrad + 20, 20);
+					if(CellData[y][x].type == cell_food) couleurCourante(20, 20, 255);
+					if(CellData[y][x].blob_bm > 0 || CellData[y][x].type == cell_food || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 				}
 			}
 			couleurCourante(28, 28, 28);
@@ -238,12 +240,22 @@ void gestionEvenement(EvenementGfx evenement)
 				//Safe check pour les coordonées en dehors de la grille et inversion de l'état.
 				if(((largeurFenetre() - MenuWidth -70< abscisseSouris()) &&	((hauteurFenetre() - 70)<ordonneeSouris())));
 				else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
-					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
-						//CellData[Sy][Sx] = !CellData[Sy][Sx];
+				if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
+					if(selection == 'b'){
 						blobNumber++;
 						blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
 						blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);
-						newAnt(&blobs[blobNumber-1].ants, &blobs[blobNumber-1].nAnts, new2Dcoord(Sx,Sy), -2, -2, 500, 50, blobs[blobNumber-1].id, 20);
+						//newAnt(&blobs[blobNumber-1].ants, &blobs[blobNumber-1].nAnts, new2Dcoord(Sx,Sy), -2, -2, 500, 50, blobs[blobNumber-1].id, 20);
+					}
+					else if(selection == 'f'){
+						for (int y = 0; y < DataSizeY; y++){
+							for (int x = 0; x < DataSizeX; x++){
+								if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5){
+									CellData[y][x] = newCell(cell_food, 200, -1, -1);
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -323,7 +335,12 @@ void gestionEvenement(EvenementGfx evenement)
 				buttons[1].TogggleStatus = pause;
 				buttons[1].state = buttons[1].TogggleStatus ? Clicked : Idle;
 			}
-			
+			if(caractereClavier() == 'f'){
+				selection = caractereClavier();
+			}
+			if(caractereClavier() == 'b'){
+				selection = caractereClavier();
+			}
 			break;
 		case Redimensionnement:
 			//Mise à jour de la fenêtre
