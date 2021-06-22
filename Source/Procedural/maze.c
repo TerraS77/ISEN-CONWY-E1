@@ -1,4 +1,8 @@
-#include <../Maze/maze.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include <time.h>
+#include "maze.h"
 
 /*
 	.___  ___.      ___       ________   _______     _______ .__   __.   _______  __  .__   __.  _______ 

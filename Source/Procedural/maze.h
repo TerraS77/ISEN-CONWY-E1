@@ -1,5 +1,3 @@
-#include <time.h>
-
 /*
 	.___  ___.      ___       ________   _______     _______ .__   __.   _______  __  .__   __.  _______ 
 	|   \/   |     /   \     |       /  |   ____|   |   ____||  \ |  |  /  _____||  | |  \ |  | |   ____|
@@ -28,7 +26,7 @@ printMazeData(mazeData, CellData, Wmaze, Hmaze, SizeMaze); -> Affiche le laby
 
 */
 
-void mazeEngine(int **tab, int W, int H);									 
+void mazeEngine(int **tab, int W, int H, int MATRIX_W, int MATRIX_H);									 
 void updateMetaData(int **metaData, int id1, int id2, int W, int H); 
 void setMetaData(int **metaData, int **mazeData, int W, int H);		 
 void printMazeData(int **mazeData, int **CellData, int W, int H, int size);   

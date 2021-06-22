@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "ConwayEngine.h"
+#include "blobEngine.h"
 
 #define OOBPenality 50
 #define WallPenality 20

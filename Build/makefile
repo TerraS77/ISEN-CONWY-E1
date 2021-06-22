@@ -1,4 +1,4 @@
-# PATH
+# PATHS
 # SmartUI
 S_SUI = ../Source/SmartUI
 B_SUI = ./SmartUI
@@ -12,8 +12,8 @@ S_GEN = ../Source/Procedural
 B_GEN = ./Procedural
 
 # Menu
-S_MENU = ../Source/Procedural
-B_MENU = ./Procedural
+S_MENU = ../Source/Menu
+B_MENU = ./Menu
 
 # GfxLib
 S_GFX = ../Source/GfxLib
@@ -23,38 +23,41 @@ B_GFX = ./GfxLib
 S_BE = ../Source/BlobEngine
 B_BE = ./BlobEngine
 
-#EXECUTABLE
-conwayApp: $(B_SG)/SmartGrid.o $(B_GFX)/libisentlib.a  $(B_SU)/SmartUI.o $(B_CE)/ConwayEngine.o
-	mv ConwayEngine.o $(B_CE)/
+# EXECUTABLE
+blobEngineApp: $(B_SG)/SmartGrid.o $(B_GFX)/libisentlib.a $(B_GFX)/BmpLib.o $(B_SUI)/SmartUI.o $(B_BE)/BlobEngine.o $(B_GEN)/maze.o $(B_GEN)/rock.o $(B_MENU)/menu.o
+	mv BlobEngine.o $(B_BE)/
 	mv SmartGrid.o $(B_SG)/
-	mv SmartUI.o $(B_SU)/
-	gcc -Wall $(B_SG)/SmartGrid.o -o conwayApp $(B_GFX)/libisentlib.a $(B_SU)/SmartUI.o $(B_CE)/ConwayEngine.o -lm -lglut -lGL -lX11
+	mv SmartUI.o $(B_SUI)/
+	mv menu.o $(B_MENU)/
+	mv maze.o $(B_GEN)/
+	mv rock.o $(B_GEN)/
+	gcc -Wall $(B_SG)/SmartGrid.o -o blobEngineApp $(B_GFX)/libisentlib.a $(B_GFX)/OutilsLib.o $(B_GFX)/BmpLib.o $(B_SUI)/SmartUI.o $(B_BE)/BlobEngine.o $(B_GEN)/maze.o $(B_GEN)/rock.o $(B_MENU)/menu.o -lm -lglut -lGL -lX11
 
-#BLOB ENGINE
-$(B_BE)/BlobEngine.o: $(S_BE)/BlobEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
+# BLOB ENGINE
+$(B_BE)/BlobEngine.o: $(S_BE)/BlobEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SUI)/SmartUI.h $(S_BE)/BlobEngine.h
 	gcc -Wall -c $(S_BE)/BlobEngine.c
 
-#SMART GRID
-$(B_SG)/SmartGrid.o: $(S_SG)/SmartGrid.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h $(S_BE)/ConwayEngine.h
+# SMART GRID
+$(B_SG)/SmartGrid.o: $(S_SG)/SmartGrid.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SUI)/SmartUI.h $(S_BE)/BlobEngine.h $(S_GEN)/rock.h $(S_GEN)/maze.h
 	gcc -Wall  -c $(S_SG)/SmartGrid.c
 
-#SMART UI
-$(B_SU)/SmartUI.o: $(S_SU)/SmartUI.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
-	gcc -Wall  -c $(S_SU)/SmartUI.c
+# SMART UI
+$(B_SUI)/SmartUI.o: $(S_SUI)/SmartUI.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SUI)/SmartUI.h
+	gcc -Wall  -c $(S_SUI)/SmartUI.c
 
 # MAZE
 $(B_GEN)/maze.o: $(S_GEN)/maze.c $(S_GEN)/maze.h
 	gcc -Wall  -c $(S_GEN)/maze.c
 
 # ROCK
-$(B_GEN)/RockGen.o: $(S_GEN)/RockGen.c $(S_GEN)/RockGen.h
-	gcc -Wall  -c $(S_GEN)/RockGen.c
+$(B_GEN)/rock.o: $(S_GEN)/rock.c $(S_BE)/BlobEngine.h $(S_GEN)/rock.h
+	gcc -Wall  -c $(S_GEN)/rock.c
 
-#MENU
-$(B_GEN)/RockGen.o: $(S_GEN)/RockGen.c $(S_GEN)/RockGen.h
-	gcc -Wall  -c $(S_GEN)/RockGen.c
+# MENU
+$(B_MENU)/menu.o: $(S_MENU)/menu.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_BE)/BlobEngine.h $(S_SUI)/SmartUI.h $(S_MENU)/menu.h
+	gcc -Wall  -c $(S_MENU)/menu.c
 
-#BMP LIB
+# BMP LIB
 $(B_GFX)/libisentlib.a: $(B_GFX)/BmpLib.o $(B_GFX)/ErreurLib.o $(B_GFX)/ESLib.o $(B_GFX)/GfxLib.o $(B_GFX)/OutilsLib.o $(B_GFX)/VectorLib.o
 	mv BmpLib.o $(B_GFX)/
 	mv ESLib.o $(B_GFX)/
@@ -85,8 +88,10 @@ $(B_GFX)/VectorLib.o: $(S_GFX)/VectorLib.c $(S_GFX)/VectorLib.h
 
 # CELAN (DOIT ETRE APPLIQUER SYSTEMATIQUEMENT AVANT UN MAKE)
 deepclean:
-	rm -f conwayApp
-	rm -f ./ConwayEngine/*
+	rm -f blobEngineApp
+	rm -f ./BlobEngine/*
 	rm -f ./GfxLib/*
 	rm -f ./SmartGrid/*
 	rm -f ./SmartUI/*
+	rm -f ./Menu/*
+	rm -f ./Procedural/*

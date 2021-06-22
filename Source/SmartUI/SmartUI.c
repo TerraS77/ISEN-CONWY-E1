@@ -3,7 +3,6 @@
 #include <math.h>	
 #include <string.h>
 #include "../GfxLib/GfxLib.h" // Seul cet include est necessaire pour faire du graphique
-#include "../GfxLib/BmpLib.h" // Cet include permet de manipuler des fichiers BMP
 #include "../GfxLib/ESLib.h" // Pour utiliser valeurAleatoire()
 #include "SmartUI.h"
 
@@ -79,11 +78,22 @@ slider newSlider(coord2D centerPoint, int width, int min, int max, int step, col
 
 //FONCTIONS D'AFFICHAGE
 
-void cercle(float centreX, float centreY){
+void cursor(float centreX, float centreY){
 	const int Pas = 40;
 	const double PasAngulaire = 2.*M_PI/Pas;
 	int index;
 	float rayon = CURSOR_R;
+	for (index = 0; index < Pas; ++index){
+		const double angle = 2.*M_PI*index/Pas;
+		triangle(centreX, centreY, centreX+rayon*cos(angle), centreY+rayon*sin(angle), centreX+rayon*cos(angle+PasAngulaire), centreY+rayon*sin(angle+PasAngulaire));
+	}
+}
+
+void circle(float centreX, float centreY, float rayon)
+{
+	const int Pas = 40;
+	const double PasAngulaire = 2.*M_PI/Pas;
+	int index;
 	for (index = 0; index < Pas; ++index){
 		const double angle = 2.*M_PI*index/Pas;
 		triangle(centreX, centreY, centreX+rayon*cos(angle), centreY+rayon*sin(angle), centreX+rayon*cos(angle+PasAngulaire), centreY+rayon*sin(angle+PasAngulaire));
@@ -144,7 +154,7 @@ void printUI(button *buttons, int arraySizeB, slider *sliders, int arraySizeS, t
                 couleurCourante(s.RGBclick.R, s.RGBclick.G, s.RGBclick.B);
                 break;
             }
-            cercle(s.cursor.x,s.cursor.y);
+            cursor(s.cursor.x,s.cursor.y);
         }
     }
     for(int n = 0; n < arraySizeT; n++){

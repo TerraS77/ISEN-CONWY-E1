@@ -4,6 +4,8 @@
         "gfxlib.h": "c",
         "bmplib.h": "c",
         "conwayengine.h": "c",
-        "smartui.h": "c"
+        "smartui.h": "c",
+        "rock.h": "c",
+        "eslib.h": "c"
     }
 }

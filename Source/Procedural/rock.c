@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#include "RockGen.h"
+#include "rock.h"
+#include "../BlobEngine/blobEngine.h"
 
 void makeRock(int ***tab, int W, int H)
 {
@@ -180,7 +181,7 @@ void bakeHole(int ***tab, int W, int H)
 	vect.x = Vx;
 	vect.y = Vy;
 
-	vect = crunchSpeed(vect);
+	vect = crunchSpeed(vect,1);
 
 	for (int i = 0; i < 2 * D; i++)
 	{
@@ -235,14 +236,6 @@ void bakeHole(int ***tab, int W, int H)
 	}
 }
 
-vector crunchSpeed(vector vect)
-{
-	float a = 1 / (sqrtf(powf(vect.x, 2.0) + powf(vect.y, 2.0)));
-	vect.x *= a;
-	vect.y *= a;
-	return vect;
-}
-
 void RockPanel(int nC, int **CellData, int DataSizeX, int DataSizeY)
 {
 
@@ -279,4 +272,15 @@ void RockPanel(int nC, int **CellData, int DataSizeX, int DataSizeY)
 			}
 		}
 	}
+}
+
+int getAliveNeyboors(int **tab, int x, int y, int xmax, int ymax){
+	int AN = 0;
+	for(int ty = -1; ty < 2 ; ty++){
+		for(int tx = -1; tx < 2; tx++){
+			if((x+tx) > 0 && (x+tx) < xmax && (y+ty) > 0 && (y+ty) < ymax) 
+				if(tab[y+ty][x+tx] == 1) AN++;
+		}
+	}
+	return (AN-tab[y][x]);
 }

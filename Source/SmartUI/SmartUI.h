@@ -1,6 +1,8 @@
 #include <stdbool.h>
+#ifndef SMART_UI
+#define SMART_UI
 typedef enum {Idle, Hover, Clicked, Hiden} status;
-typedef enum {none, UpdateSpeed, TogglePause, Leave, RESET, MENU, ChangeMenu, addType1, addType2, addType3 } action;
+typedef enum {none, menu_Main, menu_Laby, menu_Env, menu_Void, menu_Sandbox, UpdateSpeed, TogglePause, Leave, RESET, MENU, ChangeMenu, addType1, addType2, addType3} action;
 
 typedef struct{
     int x;
@@ -69,3 +71,6 @@ void whenHoverUI(button buttons[], int arraySize, slider sliders[], int arraySiz
 void updateButton(button *b, coord2D centerPoint);
 void updateSlider(slider *s, coord2D centerPoint);
 void updateText(text *t, coord2D position);
+
+void circle(float centreX, float centreY, float rayon);
+#endif
