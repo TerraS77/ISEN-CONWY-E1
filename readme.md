@@ -37,3 +37,44 @@ Cette librairie contient tout ce qui concerne l'affichage de la grille, le dépl
 ## Menu
 
 Cette librairie contient le menu principal et le menu contextuel secondaire à la simulation.
+
+# Utilisation et Fonctionnalitées
+
+## Menu Principal
+
+**Accès à 4 simulations différentes**
+- Simulation Labyrinthe : On place un Blob dans un labyrinthe généré procéduralement et il doit trouver la nourriture dans celui-ci.
+- Simulation Environnement : On place un Blob dans un environnement généré procéduralement où il devra trouver de la nourriture pour survivre
+- Simulation Vide : On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
+- Simulation Custom : On place un Blob dans un environnement que l'on peut modifier selon nos envies.
+
+
+## Navigation et Controle
+
+- Clic Droit appuyé + déplacement souris : déplacement dans la grille
+- Scroll-Up/Scroll-Down : Zoom/Dezoom de la grille
+- Clic Gauche sur une case de la grille : apparition d'une cellule
+- Touche F : Permet de selectionner la nourriture afin de la poser sur la grille
+- Touche B : Permet de séléctionner le Blob afin de le poser sur la grille
+- Touche W : Permet de séléctionner le mur afin d'en poser sur la grille.
+
+
+## Paramètres du Simulation
+
+**Paramètre du Blob**
+- Rareté de Ramification
+- Périmètre de détection de la nourriture
+- Niveau de Répulsivité entre les parties mortes du Blob et le Blob
+- Niveau de Répulsivité entre les murs et le Blob
+- Niveau de Répulsivité entre les parties vivantes du Blob
+- Niveau d'Attraction du Blob à la nourriture
+- Influence de l'oscillation des autres cellules du Blob sur son développement
+
+## Edition de la grille
+
+Possibilité d'ajouter des Blobs, des Walls et de la Nourriture grâce à la partie Edition dans la grille.
+
+
+## Génération procédurale
+
+Le labyrinthe et l'environnement sont générés procéduralements à l'aide d'algorithme à évènements discrets.
