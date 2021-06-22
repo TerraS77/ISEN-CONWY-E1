@@ -42,15 +42,11 @@ Cette librairie contient le menu principal et le menu contextuel secondaire à l
 
 ## Menu Principal
 
-**Accès à 4 simulations différentes :**
-#### Simulation Labyrinthe
-On place un Blob dans un labyrinthe généré procéduralement et il doit trouver la nourriture dans celui-ci.
-#### Simulation Environnement
-On place un Blob dans un environnement généré procéduralement où il devra trouver de la nourriture pour survivre
-#### Simulation Vide
-On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
-#### Simulation Custom
-On place un Blob dans un environnement que l'on peut modifier selon nos envies.
+**Accès à 4 simulations différentes**
+- Simulation Labyrinthe : On place un Blob dans un labyrinthe généré procéduralement et il doit trouver la nourriture dans celui-ci.
+- Simulation Environnement : On place un Blob dans un environnement généré procéduralement où il devra trouver de la nourriture pour survivre
+- Simulation Vide : On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
+- Simulation Custom : On place un Blob dans un environnement que l'on peut modifier selon nos envies.
 
 
 ## Navigation et Controle
