@@ -50,20 +50,36 @@ On place un Blob dans un environnement généré procéduralement où il devra t
 ### Simulation Vide
 On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
 ### Simulation Custom
-
+On place un Blob dans un environnement que l'on peut modifier selon nos envies.
 
 
 ## Navigation et Controle
-navig sur grille
-espace F B W (food blob wall)
+
+Clic Droit appuyé + déplacement souris : déplacement dans la grille
+Scroll-Up/Scroll-Down : Zoom/Dezoom de la grille
+
+Clic Gauche sur une case de la grille : apparition d'une cellule
+Touche F : Permet de selectionner la nourriture afin de la poser sur la grille
+Touche B : Permet de séléctionner le Blob afin de le poser sur la grille
+Touche W : Permet de séléctionner le mur afin d'en poser sur la grille.
+
 
 ## Paramètres du Simulation
 
-tous les parametres du Blob
+Paramètre du Blob : 
+- Rareté de Ramification
+- Périmètre de détection de la nourriture
+- Niveau de Répulsivité entre les parties mortes du Blob et le Blob
+- Niveau de Répulsivité entre les murs et le Blob
+- Niveau de Répulsivité entre les parties vivantes du Blob
+- Niveau d'Attraction du Blob à la nourriture
+- Influence de l'oscillation des autres cellules du Blob sur son développement
 
 ## Edition de la grille
 
-Paint avec Blob Wall et Food
+Possibilité d'ajouter des Blobs, des Walls et de la Nourriture grâce à la partie Edition dans la grille.
+
 
 ## Génération procédurale
 
+Le labyrinthe et l'environnement sont générés procéduralements à l'aide d'algorithme à évènements discrets.
