@@ -42,26 +42,25 @@ Cette librairie contient le menu principal et le menu contextuel secondaire à l
 
 ## Menu Principal
 
-Accès à 4 simulations différentes :
-### Simulation Labyrinthe
+**Accès à 4 simulations différentes :**
+#### Simulation Labyrinthe
 On place un Blob dans un labyrinthe généré procéduralement et il doit trouver la nourriture dans celui-ci.
-### Simulation Environnement
+#### Simulation Environnement
 On place un Blob dans un environnement généré procéduralement où il devra trouver de la nourriture pour survivre
-### Simulation Vide
+#### Simulation Vide
 On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
-### Simulation Custom
+#### Simulation Custom
 On place un Blob dans un environnement que l'on peut modifier selon nos envies.
 
 
 ## Navigation et Controle
 
-Clic Droit appuyé + déplacement souris : déplacement dans la grille
-Scroll-Up/Scroll-Down : Zoom/Dezoom de la grille
-
-Clic Gauche sur une case de la grille : apparition d'une cellule
-Touche F : Permet de selectionner la nourriture afin de la poser sur la grille
-Touche B : Permet de séléctionner le Blob afin de le poser sur la grille
-Touche W : Permet de séléctionner le mur afin d'en poser sur la grille.
+- Clic Droit appuyé + déplacement souris : déplacement dans la grille
+- Scroll-Up/Scroll-Down : Zoom/Dezoom de la grille
+- Clic Gauche sur une case de la grille : apparition d'une cellule
+- Touche F : Permet de selectionner la nourriture afin de la poser sur la grille
+- Touche B : Permet de séléctionner le Blob afin de le poser sur la grille
+- Touche W : Permet de séléctionner le mur afin d'en poser sur la grille.
 
 
 ## Paramètres du Simulation
