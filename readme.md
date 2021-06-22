@@ -61,7 +61,7 @@ Cette librairie contient le menu principal et le menu contextuel secondaire à l
 
 ## Paramètres du Simulation
 
-Paramètre du Blob : 
+**Paramètre du Blob**
 - Rareté de Ramification
 - Périmètre de détection de la nourriture
 - Niveau de Répulsivité entre les parties mortes du Blob et le Blob
