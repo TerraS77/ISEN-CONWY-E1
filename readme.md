@@ -37,3 +37,33 @@ Cette librairie contient tout ce qui concerne l'affichage de la grille, le dépl
 ## Menu
 
 Cette librairie contient le menu principal et le menu contextuel secondaire à la simulation.
+
+# Utilisation et Fonctionnalitées
+
+## Menu Principal
+
+Accès à 4 simulations différentes :
+### Simulation Labyrinthe
+On place un Blob dans un labyrinthe généré procéduralement et il doit trouver la nourriture dans celui-ci.
+### Simulation Environnement
+On place un Blob dans un environnement généré procéduralement où il devra trouver de la nourriture pour survivre
+### Simulation Vide
+On place un Blob dans un espace vide afin de voir son évolution sans aucun obstacle.
+### Simulation Custom
+
+
+
+## Navigation et Controle
+navig sur grille
+espace F B W (food blob wall)
+
+## Paramètres du Simulation
+
+tous les parametres du Blob
+
+## Edition de la grille
+
+Paint avec Blob Wall et Food
+
+## Génération procédurale
+
