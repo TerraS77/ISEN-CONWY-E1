@@ -1,14 +1,17 @@
 S_GFX = ../Source/GfxLib
 B_GFX = ./GfxLib
 
-S_CE = ../Source/ConwayEngine
-B_CE = ./ConwayEngine
+S_BE = ../Source/BlobEngine
+B_BE = ./BlobEngine
+
+S_GEN = ../Source/Procedural
+B_GEN = ./Procedural
 
 S_SG = ../Source/SmartGrid
 B_SG = ./SmartGrid
 
-S_SU = ../Source/SmartUI
-B_SU = ./SmartUI
+S_SUI = ../Source/SmartUI
+B_SUI = ./SmartUI
 
 conwayApp: $(B_SG)/SmartGrid.o $(B_GFX)/libisentlib.a  $(B_SU)/SmartUI.o $(B_CE)/ConwayEngine.o
 	mv ConwayEngine.o $(B_CE)/
@@ -16,8 +19,8 @@ conwayApp: $(B_SG)/SmartGrid.o $(B_GFX)/libisentlib.a  $(B_SU)/SmartUI.o $(B_CE)
 	mv SmartUI.o $(B_SU)/
 	gcc -Wall $(B_SG)/SmartGrid.o -o conwayApp $(B_GFX)/libisentlib.a $(B_SU)/SmartUI.o $(B_CE)/ConwayEngine.o -lm -lglut -lGL -lX11
 
-$(B_CE)/ConwayEngine.o: $(S_CE)/ConwayEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
-	gcc -Wall -c $(S_CE)/ConwayEngine.c
+$(B_BE)/BlobEngine.o: $(S_BE)/BlobEngine.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h
+	gcc -Wall -c $(S_CE)/BlobEngine.c
 
 $(B_SG)/SmartGrid.o: $(S_SG)/SmartGrid.c $(S_GFX)/GfxLib.h $(S_GFX)/BmpLib.h $(S_GFX)/ESLib.h $(S_SU)/SmartUI.h $(S_CE)/ConwayEngine.h
 	gcc -Wall  -c $(S_SG)/SmartGrid.c
@@ -52,16 +55,6 @@ $(B_GFX)/OutilsLib.o: $(S_GFX)/OutilsLib.c $(S_GFX)/OutilsLib.h
 	
 $(B_GFX)/VectorLib.o: $(S_GFX)/VectorLib.c $(S_GFX)/VectorLib.h
 	gcc -Wall -O2 -c $(S_GFX)/VectorLib.c -msse3
-
-# Sous MacOSX, commenter la ligne de commande ci-dessus (en mettant un # au debut)
-# et de-commenter la ligne de commande ci-apres :
-#	gcc -Wall -O2 -c WavLib.c
-
-#zip:
-#	tar -cvzf libisentlib.tgz *.[ch] *.bmp *.pdf makefile
-
-clean:
-#	rm -f *~ *.o
 
 deepclean:
 	rm -f conwayApp

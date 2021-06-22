@@ -1,6 +1,6 @@
 #include <stdbool.h>
 typedef enum {Idle, Hover, Clicked, Hiden} status;
-typedef enum {none, UpdateSpeed, TogglePause, Leave, RESET,MENU} action;
+typedef enum {none, UpdateSpeed, TogglePause, Leave, RESET, MENU, ChangeMenu, addType1, addType2, addType3 } action;
 
 typedef struct{
     int x;
