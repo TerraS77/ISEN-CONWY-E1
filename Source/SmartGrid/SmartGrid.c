@@ -102,6 +102,7 @@ void gestionEvenement(EvenementGfx evenement)
 		free(buttons);
 		free(sliders);
 		free(texts);
+		if(CellData != NULL) freeCellData(&CellData, DataSizeX, DataSizeY);
 		evenement = Initialisation;
 		OutputCache = menuOutput;
 	}
@@ -111,9 +112,37 @@ void gestionEvenement(EvenementGfx evenement)
 	}else{
 		switch (evenement){
 			case Initialisation:
-				;
 				srand(time(NULL));
-				iniCellData(&CellData, DataSizeX, DataSizeY);
+				switch(menuOutput){
+					case menu_Laby :
+						DataSizeX = 400;
+						DataSizeY = 400;
+						iniCellData(&CellData, DataSizeX, DataSizeY);
+						int **WallGrid = NULL;
+						iniGridData(&WallGrid, DataSizeX, DataSizeY);
+						mazeEngine(WallGrid, DataSizeX, DataSizeY, DataSizeX, DataSizeY);
+						for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
+						freeGridData(&WallGrid, DataSizeX, DataSizeY);
+						break;
+					case menu_Env :
+						DataSizeX = 600;
+						DataSizeY = 400;
+						iniCellData(&CellData, DataSizeX, DataSizeY);
+
+						break;
+					case menu_Void :
+						DataSizeX = 1000;
+						DataSizeY = 500;
+						iniCellData(&CellData, DataSizeX, DataSizeY);
+
+						break;
+					case menu_Sandbox :
+						DataSizeX = 900;
+						DataSizeY = 900;
+						iniCellData(&CellData, DataSizeX, DataSizeY);
+
+						break;
+				}
 				DeltaX = DataSizeX/4;
 				DeltaY = DataSizeY/4;
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
@@ -167,9 +196,12 @@ void gestionEvenement(EvenementGfx evenement)
 						int LBCy = (y + 1) * (CellSize + CellInBetween) - (DeltaY * (CellSize + CellInBetween));
 						int RTCx = (x + 1) * (CellSize + CellInBetween) - (DeltaX * (CellSize + CellInBetween));
 						int RTCy = y * (CellSize + CellInBetween) + CellInBetween - (DeltaY * (CellSize + CellInBetween));
+						//COLOR SELECTION
 						int colorGrad = CellData[y][x].blob_bm > 230 ? 230 : CellData[y][x].blob_bm;
 						CellData[y][x].blob_bm < 0 ? couleurCourante(20, 20, 20) : couleurCourante(colorGrad + 20, colorGrad + 20, 20);
 						if(CellData[y][x].type == cell_food) couleurCourante(20, 20, 255);
+						if(CellData[y][x].type == cell_block) couleurCourante(240, 240, 240);
+						//PRINTING
 						if(CellData[y][x].blob_bm > 0 || CellData[y][x].type == cell_food || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 					}
 				}
