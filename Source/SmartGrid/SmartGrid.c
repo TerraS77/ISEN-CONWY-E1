@@ -113,22 +113,21 @@ void gestionEvenement(EvenementGfx evenement)
 		switch (evenement){
 			case Initialisation:
 				srand(time(NULL));
+				int **WallGrid = NULL;
 				switch(menuOutput){
 					case menu_Laby :
 						DataSizeX = 400;
 						DataSizeY = 400;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
-						int **WallGrid = NULL;
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, DataSizeX, DataSizeY);
-						for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
-						freeGridData(&WallGrid, DataSizeX, DataSizeY);
 						break;
 					case menu_Env :
 						DataSizeX = 600;
 						DataSizeY = 400;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
-
+						iniGridData(&WallGrid, DataSizeX, DataSizeY);
+						RockPanel(120, WallGrid, DataSizeX, DataSizeY);
 						break;
 					case menu_Void :
 						DataSizeX = 1000;
@@ -140,9 +139,10 @@ void gestionEvenement(EvenementGfx evenement)
 						DataSizeX = 900;
 						DataSizeY = 900;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
-
 						break;
 				}
+				if(menuOutput != menu_Void) for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
+				freeGridData(&WallGrid, DataSizeX, DataSizeY);
 				DeltaX = DataSizeX/4;
 				DeltaY = DataSizeY/4;
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
@@ -153,10 +153,10 @@ void gestionEvenement(EvenementGfx evenement)
 				sim.ramificationRarity = 20;
 				sim.RepMucusMultiplicator = 1;
 				sim.RepSelfMultiplicator = 0.5;
-				sim.RepWallMultiplicator = 1;
+				sim.RepWallMultiplicator = 0.2;
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
-				demandeTemporisation(20);
+				demandeTemporisation(10);
 			break;
 			
 			case Temporisation: ;
@@ -202,7 +202,7 @@ void gestionEvenement(EvenementGfx evenement)
 						if(CellData[y][x].type == cell_food) couleurCourante(20, 20, 255);
 						if(CellData[y][x].type == cell_block) couleurCourante(240, 240, 240);
 						//PRINTING
-						if(CellData[y][x].blob_bm > 0 || CellData[y][x].type == cell_food || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+						if(CellData[y][x].type != cell_empty || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 					}
 				}
 				//Menu
