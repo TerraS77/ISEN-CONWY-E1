@@ -247,7 +247,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	static int nButtons = 0;
 	static int nSliders = 0;
 	static int nTexts = 0;
-
+	static int loaded = 0;
 	static int W_temp;
 	static int H_temp;
 
@@ -264,7 +264,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	static int border = 3;
 	static DonneesImageRGB *header = NULL;
 	switch (evenement){
-		case Initialisation:
+		case Initialisation:;
+			loaded = 0;
 			*DataSizeX = MM_W;
 			*DataSizeY = MM_H;
 			iniGridData(&CellData, *DataSizeX, *DataSizeY);
@@ -397,34 +398,37 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 					}
 				}
 			}
+			loaded = 1;
 			rafraichisFenetre();
 			break;
 		case Affichage:
 			effaceFenetre(28,28,28);
-			ecrisImage(0, hauteurFenetre() - header->hauteurImage, header->largeurImage, header->hauteurImage, header->donneesRGB);
-			printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
-			for (int i = 0; i < 2; i++){
-				for (int j = 0; j < 2; j++){
-					for (int y = 0; y < HcellCap; y++){
-						for (int x = 0; x < WcellCap; x++){
-							int LBCx = largeurFenetre() * (1 + i)/3 - W_temp/2 + (x * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
-							int LBCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + ((y + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
-							int RTCx = largeurFenetre() * (1 + i)/3  - W_temp/2 + ((x + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
-							int RTCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + (y * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
-							CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(Colors[y][x].R, Colors[y][x].G, Colors[y][x].B);
-							if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+			if(loaded){
+				ecrisImage(0, hauteurFenetre() - header->hauteurImage, header->largeurImage, header->hauteurImage, header->donneesRGB);
+				printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
+				for (int i = 0; i < 2; i++){
+					for (int j = 0; j < 2; j++){
+						for (int y = 0; y < HcellCap; y++){
+							for (int x = 0; x < WcellCap; x++){
+								int LBCx = largeurFenetre() * (1 + i)/3 - W_temp/2 + (x * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
+								int LBCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + ((y + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
+								int RTCx = largeurFenetre() * (1 + i)/3  - W_temp/2 + ((x + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
+								int RTCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + (y * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
+								CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(Colors[y][x].R, Colors[y][x].G, Colors[y][x].B);
+								if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+							}
 						}
 					}
 				}
+				couleurCourante(255,0,0);
+				circle(largeurFenetre()-40, hauteurFenetre()-40, 28);
+				sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255,0,0) : couleurCourante(28, 28, 28);
+				circle(largeurFenetre()-40, hauteurFenetre()-40, 26);
+				sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255, 255, 255) : couleurCourante(255,0,0);
+				epaisseurDeTrait(4);
+				ligne(largeurFenetre()-54, hauteurFenetre()-54, largeurFenetre()-26, hauteurFenetre()-26);
+				ligne(largeurFenetre()-26, hauteurFenetre()-54, largeurFenetre()-54, hauteurFenetre()-26);
 			}
-			couleurCourante(255,0,0);
-			circle(largeurFenetre()-40, hauteurFenetre()-40, 28);
-			sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255,0,0) : couleurCourante(28, 28, 28);
-			circle(largeurFenetre()-40, hauteurFenetre()-40, 26);
-			sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255, 255, 255) : couleurCourante(255,0,0);
-			epaisseurDeTrait(4);
-			ligne(largeurFenetre()-54, hauteurFenetre()-54, largeurFenetre()-26, hauteurFenetre()-26);
-			ligne(largeurFenetre()-26, hauteurFenetre()-54, largeurFenetre()-54, hauteurFenetre()-26);
 			break;
 
 		case BoutonSouris:

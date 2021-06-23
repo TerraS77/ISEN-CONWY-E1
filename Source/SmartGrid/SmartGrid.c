@@ -79,7 +79,8 @@ void gestionEvenement(EvenementGfx evenement)
 	static int gen=0;
 	static int seuil=0;
 	static int tick = 0;
-	static bool menuType=false;
+	static int addType = 0;
+	static bool menuType = true;
 	
 	//Mouse coords
 	static float fx;
@@ -217,20 +218,16 @@ void gestionEvenement(EvenementGfx evenement)
 					if(((largeurFenetre() - MenuWidth -70< abscisseSouris()) &&	((hauteurFenetre() - 70)<ordonneeSouris())));
 					else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
-						if(selection == 'b'){
+						if(addType == 1){
 							blobNumber++;
 							blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
 							blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);
 						}
-						else if(selection == 'f'){
-							for (int y = 0; y < DataSizeY; y++){
-								for (int x = 0; x < DataSizeX; x++){
-									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5){
+						if(addType == 2)
+							for (int y = 0; y < DataSizeY; y++)
+								for (int x = 0; x < DataSizeX; x++)
+									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5)
 										CellData[y][x] = newCell(cell_food, 200, -1, -1);
-									}
-								}
-							}
-						}
 					}
 				}
 
@@ -257,18 +254,73 @@ void gestionEvenement(EvenementGfx evenement)
 				if(etatBoutonSouris() == DroiteRelache) RCD = false;
 
 				if (etatBoutonSouris() == GaucheAppuye){
-					switch (whenClickedUI(buttons,nButtons,sliders, nSliders, new2Dcoord(abscisseSouris(),ordonneeSouris()))){
-						case RESET :
-							gen=0;
-							iniCellData(&CellData, DataSizeX, DataSizeY);
-							break;
-						case Leave :
-							freeCellData(&CellData,DataSizeX, DataSizeY);
-							exit(EXIT_SUCCESS);
-							break;
-						case MENU :
-							MenuStatus = !MenuStatus;
-							break;
+					if (menuType == false){
+						switch (whenClickedUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
+							case RESET:
+								gen = 0;
+								iniCellData(&CellData, DataSizeX, DataSizeY);
+								break;
+							case Leave:
+								freeCellData(&CellData, DataSizeX, DataSizeY);
+								exit(EXIT_SUCCESS);
+								break;
+							case MENU:
+								MenuStatus = !MenuStatus;
+								break;
+							case ChangeMenu:
+								menuType = !menuType;
+								break;
+						}
+					}else{
+						switch (whenClickedUI(buttons2, nButtons2, sliders2, nSliders2, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
+							case RESET:
+								gen = 0;
+								iniCellData(&CellData, DataSizeX, DataSizeY);
+								break;
+							case Leave:
+								freeCellData(&CellData, DataSizeX, DataSizeY);
+								exit(EXIT_SUCCESS);
+								break;
+							case MENU:
+								MenuStatus = !MenuStatus;
+								break;
+							case ChangeMenu:
+								menuType = !menuType;
+								break;
+						}
+					}
+				}
+				if (etatBoutonSouris() == GaucheRelache){
+					if (menuType == false){
+						switch (whenReleasedUI(buttons, nButtons, sliders, nSliders)){
+							case TogglePause:
+								pause = !pause;
+								break;
+						}
+					}else{
+						switch (whenReleasedUI(buttons2, nButtons2, sliders2, nSliders2)){
+							case TogglePause:
+								pause = !pause;
+								break;
+							case addType1:
+								if (addType == 1) addType = 0;
+								else addType = 1;
+								buttons2[7].TogggleStatus = false;
+								buttons2[8].TogggleStatus = false;
+								break;
+							case addType2:
+								if (addType == 2) addType = 0;
+								else addType = 2;
+								buttons2[6].TogggleStatus = false;
+								buttons2[8].TogggleStatus = false;
+								break;
+							case addType3:
+								if (addType == 3) addType = 0;
+								else addType = 3;
+								buttons2[6].TogggleStatus = false;
+								buttons2[7].TogggleStatus = false;
+								break;
+						}
 					}
 				}
 
@@ -304,16 +356,70 @@ void gestionEvenement(EvenementGfx evenement)
 				break;
 			case Clavier:
 				//Système Start/Stop (initialement stop)
-				if(caractereClavier() == 32){
+				if (caractereClavier() == 32)
+				{
 					pause = !pause;
 					buttons[1].TogggleStatus = pause;
 					buttons[1].state = buttons[1].TogggleStatus ? Clicked : Idle;
+					buttons2[1].TogggleStatus = pause;
+					buttons2[1].state = buttons2[1].TogggleStatus ? Clicked : Idle;
 				}
-				if(caractereClavier() == 'f'){
-					selection = caractereClavier();
+				if (caractereClavier() == 'b')
+				{
+					if (addType == 1)
+					{
+						addType = 0;
+						buttons2[6].TogggleStatus = false;
+						buttons2[6].state = Idle;
+					}
+					else
+					{
+						addType = 1;
+						buttons2[6].TogggleStatus = true;
+						buttons2[6].state = Clicked;
+						buttons2[7].TogggleStatus = false;
+						buttons2[7].state = Idle;
+						buttons2[8].TogggleStatus = false;
+						buttons2[8].state = Idle;
+					}
 				}
-				if(caractereClavier() == 'b'){
-					selection = caractereClavier();
+				else if (caractereClavier() == 'w')
+				{
+					if (addType == 2)
+					{
+						addType = 0;
+						buttons2[7].TogggleStatus = false;
+						buttons2[7].state = Idle;
+					}
+					else
+					{
+						addType = 2;
+						buttons2[6].TogggleStatus = false;
+						buttons2[6].state = Idle;
+						buttons2[7].TogggleStatus = true;
+						buttons2[7].state = Clicked;
+						buttons2[8].TogggleStatus = false;
+						buttons2[8].state = Idle;
+					}
+				}
+				else if (caractereClavier() == 'f')
+				{
+					if (addType == 3)
+					{
+						addType = 0;
+						buttons2[8].TogggleStatus = false;
+						buttons2[8].state = Idle;
+					}
+					else
+					{
+						addType = 3;
+						buttons2[6].TogggleStatus = false;
+						buttons2[6].state = Idle;
+						buttons2[7].TogggleStatus = false;
+						buttons2[7].state = Idle;
+						buttons2[8].TogggleStatus = true;
+						buttons2[8].state = Clicked;
+					}
 				}
 				break;
 			case Redimensionnement:
