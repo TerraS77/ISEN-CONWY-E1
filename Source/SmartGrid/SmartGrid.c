@@ -140,8 +140,8 @@ void gestionEvenement(EvenementGfx evenement)
 				srand(time(NULL));
 				switch(menuOutput){
 					case menu_Laby :
-						DataSizeX = 390;
-						DataSizeY = 390;
+						DataSizeX = 395;
+						DataSizeY = 395;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
@@ -158,13 +158,17 @@ void gestionEvenement(EvenementGfx evenement)
 						DataSizeY = 500;
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
-
 						break;
 					case menu_Sandbox :
-						DataSizeX = 900;
-						DataSizeY = 900;
+						DataSizeX = 395;
+						DataSizeY = 395;
+						int **EnvData = NULL;
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
+						iniGridData(&EnvData, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
+						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
+						RockPanel(120, EnvData, DataSizeX, DataSizeY);
+						for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(EnvData[y][x]) WallGrid[y][x] = 0;
 						break;
 				}
 				if(menuOutput != menu_Void) for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
