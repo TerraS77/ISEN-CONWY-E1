@@ -348,7 +348,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 
 			header = lisBMPRGB("#Ressources/header.bmp");
 
-			demandeTemporisation(30);
+			demandeTemporisation(5);
 			break;
 
 		case Temporisation:
@@ -458,6 +458,9 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 					termineBoucleEvenements();
 				}
 			}
+			rafraichisFenetre();
+			break;
+		case Souris:
 			rafraichisFenetre();
 			break;
 	}
