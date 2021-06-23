@@ -8,6 +8,8 @@
 #include "../SmartUI/SmartUI.h"
 #include "../BlobEngine/BlobEngine.h"
 #include "menu.h"
+#define MM_H 500
+#define MM_W 1000
 
 /*
 .___  ___.  _______ .__   __.  __    __  
@@ -263,7 +265,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	static DonneesImageRGB *header = NULL;
 	switch (evenement){
 		case Initialisation:
-
+			DataSizeX = MM_W;
+			DataSizeY = MM_H;
 			iniGridData(&CellData, *DataSizeX, *DataSizeY);
 			iniColors(&Colors, *DataSizeX, *DataSizeY);
 
@@ -438,23 +441,41 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						break;
 					case menu_Env:
 						printf("menu_Env\n");
+						free(buttons);
+						freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						free(texts);
+						libereDonneesImageRGB(&header);
 						*Action = menu_Env;
 						break;
 					case menu_Void:
 						printf("menu_Void\n");
 						*Action = menu_Void;
+						free(buttons);
+						freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						free(texts);
+						libereDonneesImageRGB(&header);
 						break;
 					case menu_Sandbox:
 						printf("menu_Sandbox\n");
 						*Action = menu_Sandbox;
+						free(buttons);
+						freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						free(texts);
+						libereDonneesImageRGB(&header);
 						break;
 					default:
 						break;
 				}
 				if (sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 30){
 					printf("Quitter\n");
+					free(buttons);
 					freeGridData(&CellData, *DataSizeX, *DataSizeY);
 					freeColors(&Colors, *DataSizeX, *DataSizeY);
+					free(texts);
+					libereDonneesImageRGB(&header);
 					termineBoucleEvenements();
 				}
 			}

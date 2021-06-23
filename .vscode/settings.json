@@ -6,6 +6,7 @@
         "conwayengine.h": "c",
         "smartui.h": "c",
         "rock.h": "c",
-        "eslib.h": "c"
+        "eslib.h": "c",
+        "menu.h": "c"
     }
 }
