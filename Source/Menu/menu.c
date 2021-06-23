@@ -438,7 +438,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 			if (etatBoutonSouris() == GaucheAppuye){
 				switch (whenClickedUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
 					case menu_Laby:
-						printf("menu_Laby\n");
+						//printf("menu_Laby\n");
 						free(buttons);
 						freeGridData(&CellData, *DataSizeX, *DataSizeY);
 						freeColors(&Colors, *DataSizeX, *DataSizeY);
@@ -447,7 +447,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						*Action = menu_Laby;
 						break;
 					case menu_Env:
-						printf("menu_Env\n");
+						//printf("menu_Env\n");
 						free(buttons);
 						freeGridData(&CellData, *DataSizeX, *DataSizeY);
 						freeColors(&Colors, *DataSizeX, *DataSizeY);
@@ -456,7 +456,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						*Action = menu_Env;
 						break;
 					case menu_Void:
-						printf("menu_Void\n");
+						//printf("menu_Void\n");
 						*Action = menu_Void;
 						free(buttons);
 						freeGridData(&CellData, *DataSizeX, *DataSizeY);
@@ -465,7 +465,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						libereDonneesImageRGB(&header);
 						break;
 					case menu_Sandbox:
-						printf("menu_Sandbox\n");
+						//printf("menu_Sandbox\n");
 						*Action = menu_Sandbox;
 						free(buttons);
 						freeGridData(&CellData, *DataSizeX, *DataSizeY);
@@ -477,7 +477,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						break;
 				}
 				if (sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 30){
-					printf("Quitter\n");
+					//printf("Quitter\n");
 					free(buttons);
 					freeGridData(&CellData, *DataSizeX, *DataSizeY);
 					freeColors(&Colors, *DataSizeX, *DataSizeY);
@@ -530,13 +530,13 @@ void freeColors(color ***tab, int W, int H){
 void iniColors(color ***tab, int W, int H){
 	*tab = (color**) malloc(sizeof(color*)*H);
 	if(*tab == NULL){
-		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniGridData 1:0)");
+		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniColor 1:0)");
 		exit(EXIT_FAILURE);
 	}
 	for(int y = 0; y<H; y++){
 		(*tab)[y] = (color*) malloc(sizeof(color)*W);
 		if((*tab)[y] == NULL){
-			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniGridData 2:%d)", y);
+			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniColor 2:%d)", y);
 			for(int Y = 0; Y<y; Y++) free((*tab)[Y]);
 			free(*tab);
 			exit(EXIT_FAILURE);

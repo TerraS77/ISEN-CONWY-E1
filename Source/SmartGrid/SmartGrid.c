@@ -93,20 +93,32 @@ void gestionEvenement(EvenementGfx evenement)
 	static action menuOutput = menu_Main;
 	static action OutputCache = menu_Main;
 
-	//UPDATE MAIN DATA
+	//UPDATE MAIN DATA ET AFFICHAGE
 	fx = abscisseSouris() / (CellSize + CellInBetween);
 	fy = ordonneeSouris() / (CellSize + CellInBetween);
 	Sx = floorf(fx) + DeltaX;
 	Sy = floorf(fy) + DeltaY;
 	HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 	WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
-
+	if(DeltaX < 0) DeltaX = 0;
+	if(DeltaX + WcellCap + 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap - 1;
+	if(DeltaY < 0) DeltaY = 0;
+	if(DeltaY + HcellCap + 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap - 1;
+	while(HcellCap > DataSizeY || WcellCap > DataSizeX){
+		CellSize++;
+		HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
+		WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
+		DeltaX += floorf(fx) - floorf(abscisseSouris() / (CellSize + CellInBetween));
+		DeltaY += floorf(fy) - floorf(ordonneeSouris() / (CellSize + CellInBetween));
+		if(DeltaX < 0) DeltaX = 0;
+		if(DeltaX + WcellCap + 1 >= DataSizeX) DeltaX = DataSizeX - WcellCap - 1;
+		if(DeltaY < 0) DeltaY = 0;
+		if(DeltaY + HcellCap + 1 >= DataSizeY) DeltaY = DataSizeY - HcellCap - 1;
+	}
 	// Laby
 	static int **WallGrid = NULL;
 
 	if(OutputCache != menuOutput){
-		printf("%p ?\n", buttons);
-
 		FreePointer(&buttons);
 		FreePointer(&sliders);
 		FreePointer(&texts);
@@ -170,22 +182,18 @@ void gestionEvenement(EvenementGfx evenement)
 				sim.RepWallMultiplicator = 0.2;
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
-				demandeTemporisation(10);
+				demandeTemporisation(5);
 			break;
 			
 			case Temporisation: ;
 				//Update cell capacity
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 				WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
-				if(HcellCap > DataSizeY || WcellCap > DataSizeX){
-					printf("ERREUR CRITIQUE : AFFICHAGE SUR L'AXE %s COMPROMIS\n", HcellCap > DataSizeY ? "Y" : "X");
-					exit(EXIT_FAILURE);
-				}
 
 				//>>>Gestion de la simulation et APPEL<<<
 				//==========================================================================================================================
 				seuil = 1 / ((float) (sliders2->value + 0.1) / (float) sliders2->max);
-				if(!pause){ 
+				if(!pause){
 					tick++;
 					if(tick>=seuil) tick = 0;
 					if(tick==0){
