@@ -105,8 +105,6 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 // Afficher le menu de contrôle
 void printContextMenu(button *buttons, slider *sliders, text *texts, button *buttons2, slider *sliders2, text *texts2, int MenuWidth, int nSliders, int nButtons, int nTexts, int nSliders2, int nButtons2, int nTexts2, int vivant, int Sx2, int Sy2, int gen, simulation *sim, bool menuType, DonneesImageRGB *header)
 {
-	updateButton(&buttons[2], ((new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45))));  // Menu Arrow
-	updateButton(&buttons2[3], ((new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45)))); // Menu Arrow
 	if (MenuWidth > 0)
 	{
 		// Return to MENU
@@ -193,9 +191,10 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 		updateText(&texts2[0], new2Dcoord(largeurFenetre() - MenuWidth + 140, hauteurFenetre() - 50));		  // Coneway
 		updateText(&texts2[1], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 80));		  // Game of life
 		updateSlider(&sliders2[0], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 225));	  // Vitesse
-		updateButton(&buttons2[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 710))); // Leave
-		updateButton(&buttons2[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90, hauteurFenetre() - 650)));  // Pause
-		updateButton(&buttons2[2], (new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 650))); // Reset
+		updateButton(&buttons2[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150, 40))); // Leave
+		updateButton(&buttons2[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90, 100)));  // Pause
+		updateButton(&buttons2[2], (new2Dcoord(largeurFenetre() - MenuWidth + 200, 100))); // Reset
+		updateButton(&buttons2[3], (new2Dcoord(largeurFenetre() - MenuWidth + 33, hauteurFenetre() - 123)));  // Return to menu
 		updateButton(&buttons2[4], (new2Dcoord(largeurFenetre() - MenuWidth + 120, hauteurFenetre() - 118))); // Menu 1
 		updateButton(&buttons2[5], (new2Dcoord(largeurFenetre() - MenuWidth + 230, hauteurFenetre() - 118))); // Menu 2
 		updateButton(&buttons2[6], (new2Dcoord(largeurFenetre() - MenuWidth + 60, hauteurFenetre() - 300)));  // addType1
@@ -209,8 +208,10 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 		}else{
 			ecrisImage(largeurFenetre() - MenuWidth, hauteurFenetre() - 210, header->largeurImage, header->hauteurImage, header->donneesRGB);
 			printUI(buttons2, nButtons2, sliders2, nSliders2, texts2, nTexts2);
-		}
+		}	
 	}
+	updateButton(&buttons[2], ((new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45))));  // Menu Arrow
+	updateButton(&buttons2[3], ((new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45)))); // Menu Arrow
 
 	//KeyAnim 
 	if (MenuWidth == 290){couleurCourante(255, 255, 255);triangle(largeurFenetre() - MenuWidth - 30, hauteurFenetre() - 45, largeurFenetre() - MenuWidth - 70, hauteurFenetre() - 20, largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45);triangle(largeurFenetre() - MenuWidth - 30, hauteurFenetre() - 45, largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45, largeurFenetre() - MenuWidth - 70, hauteurFenetre() - 70);}
@@ -514,11 +515,13 @@ void iniGridData(int ***tab, int W, int H){
 void freeGridData(int ***tab, int W, int H){
 	for(int y = 0; y<H; y++) free((*tab)[y]);
 	free(*tab);
+	*tab = NULL;
 }
 
 void freeColors(color ***tab, int W, int H){
 	for(int y = 0; y<H; y++) free((*tab)[y]);
 	free(*tab);
+	*tab = NULL;
 }
 
 //Allocation dynamique et initialisation à 0 de la matrice
@@ -682,4 +685,12 @@ void saveBMP(int **tabCell, int W, int H, color **tabCol){
 	}
 	libereDonneesImageRGB(&image);
 	printf("Le fichier %s a ete enregistre ! \n", name);
+}
+
+void FreePointer(void **pointer) 
+{
+	if(*pointer != NULL){
+		free(*pointer);
+		*pointer=NULL;
+	}
 }

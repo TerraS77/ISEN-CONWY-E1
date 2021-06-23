@@ -383,4 +383,5 @@ void iniCellData(cell ***tab, int W, int H){
 void freeCellData(cell ***tab, int W, int H){
 	for(int y = 0; y<H; y++) free((*tab)[y]);
 	free(*tab);
+	*tab = NULL;
 }

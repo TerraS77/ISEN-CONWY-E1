@@ -26,7 +26,7 @@ printMazeData(mazeData, CellData, Wmaze, Hmaze, SizeMaze); -> Affiche le laby
 
 */
 
-void mazeEngine(int **tab, int W, int H, int MATRIX_W, int MATRIX_H);									 
+void mazeEngine(int **tab, int W, int H, int size);								 
 void updateMetaData(int **metaData, int id1, int id2, int W, int H); 
-void setMetaData(int **metaData, int **mazeData, int W, int H);		 
-void printMazeData(int **mazeData, int **CellData, int W, int H, int size);   
+void setMetaData(int **metaData, int **mazeData, int W, int H);
+void printMazeData(int **mazeData, int **CellData, int W, int H, int size);

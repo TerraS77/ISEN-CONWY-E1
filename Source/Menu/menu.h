@@ -28,3 +28,5 @@ void load(int **tabCell, int W, int H, color **tabCol, action Action); //Charge 
 
 void loadBMP(int **tabCell, color **tabCol); //Sauvegarde la matrice dans un fichier .bmp
 void saveBMP(int **tabCell, int W, int H, color **tabCol); //Charge la matrice depuis un fichier .bmp
+
+void FreePointer(void **pointer);

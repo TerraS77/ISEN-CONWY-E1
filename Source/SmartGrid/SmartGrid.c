@@ -18,6 +18,7 @@
 #define HauteurFenetre 1000
 #define MATRIX_H 500
 #define MATRIX_W 1000
+#define LAB_SIZE 5
 
 void gestionEvenement(EvenementGfx evenement);
 
@@ -100,11 +101,21 @@ void gestionEvenement(EvenementGfx evenement)
 	HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 	WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
 
+	// Laby
+	static int **WallGrid = NULL;
+
 	if(OutputCache != menuOutput){
-		free(buttons);
-		free(sliders);
-		free(texts);
+		printf("%p ?\n", buttons);
+
+		FreePointer(&buttons);
+		FreePointer(&sliders);
+		FreePointer(&texts);
+		FreePointer(&buttons2);
+		FreePointer(&sliders2);
+		FreePointer(&texts2);
+
 		if(CellData != NULL) freeCellData(&CellData, DataSizeX, DataSizeY);
+		if(WallGrid != NULL) freeGridData(&WallGrid, DataSizeX, DataSizeY);
 		evenement = Initialisation;
 		OutputCache = menuOutput;
 	}
@@ -115,14 +126,13 @@ void gestionEvenement(EvenementGfx evenement)
 		switch (evenement){
 			case Initialisation:
 				srand(time(NULL));
-				int **WallGrid = NULL;
 				switch(menuOutput){
 					case menu_Laby :
-						DataSizeX = 400;
-						DataSizeY = 400;
+						DataSizeX = 390;
+						DataSizeY = 390;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
-						mazeEngine(WallGrid, DataSizeX, DataSizeY, DataSizeX, DataSizeY);
+						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
 						break;
 					case menu_Env :
 						DataSizeX = 600;
@@ -134,19 +144,21 @@ void gestionEvenement(EvenementGfx evenement)
 					case menu_Void :
 						DataSizeX = 1000;
 						DataSizeY = 500;
+						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 
 						break;
 					case menu_Sandbox :
 						DataSizeX = 900;
 						DataSizeY = 900;
+						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						break;
 				}
 				if(menuOutput != menu_Void) for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
-				freeGridData(&WallGrid, DataSizeX, DataSizeY);
 				DeltaX = DataSizeX/4;
 				DeltaY = DataSizeY/4;
+				if(blobs != NULL) free(blobs);
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
 				//SIM
 				sim.AtracFoodMultiplicator = 1;
@@ -172,7 +184,7 @@ void gestionEvenement(EvenementGfx evenement)
 
 				//>>>Gestion de la simulation et APPEL<<<
 				//==========================================================================================================================
-				seuil = 1 / ((float) (sliders->value + 0.1) / (float) sliders->max);
+				seuil = 1 / ((float) (sliders2->value + 0.1) / (float) sliders2->max);
 				if(!pause){ 
 					tick++;
 					if(tick>=seuil) tick = 0;
@@ -223,7 +235,7 @@ void gestionEvenement(EvenementGfx evenement)
 							blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
 							blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);
 						}
-						if(addType == 2)
+						if(addType == 3)
 							for (int y = 0; y < DataSizeY; y++)
 								for (int x = 0; x < DataSizeX; x++)
 									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5)
@@ -235,11 +247,16 @@ void gestionEvenement(EvenementGfx evenement)
 				bool NeedScrollUpdate = false;
 				if (etatBoutonSouris() == ScrollUp && CellSize < 50 && !RCD){
 					CellSize *= 1.4;
+					if(CellSize == 3) CellSize++;
+					CellInBetween = 1;
 					NeedScrollUpdate = true;
 				}
-				if (etatBoutonSouris() == ScrollDown && CellSize > 2 && !RCD){
+				if (etatBoutonSouris() == ScrollDown && CellSize >= 1 && !RCD){
 					CellSize *= 0.6;
-					if(CellSize < 4) CellSize = 4;
+					if(CellSize < 3){
+						CellSize = 3;
+						CellInBetween = 0;
+					}
 					NeedScrollUpdate = true;
 				}
 
@@ -270,12 +287,18 @@ void gestionEvenement(EvenementGfx evenement)
 							case ChangeMenu:
 								menuType = !menuType;
 								break;
+							case menu_Main:
+								menuOutput = menu_Main;
+								break;
 						}
 					}else{
 						switch (whenClickedUI(buttons2, nButtons2, sliders2, nSliders2, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
 							case RESET:
 								gen = 0;
 								iniCellData(&CellData, DataSizeX, DataSizeY);
+								blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob));
+								blobNumber = 0;
+								for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
 								break;
 							case Leave:
 								freeCellData(&CellData, DataSizeX, DataSizeY);
@@ -286,6 +309,9 @@ void gestionEvenement(EvenementGfx evenement)
 								break;
 							case ChangeMenu:
 								menuType = !menuType;
+								break;
+							case menu_Main:
+								menuOutput = menu_Main;
 								break;
 						}
 					}

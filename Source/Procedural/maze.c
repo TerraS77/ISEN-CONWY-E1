@@ -32,30 +32,32 @@ printMazeData(mazeData, CellData, Wmaze, Hmaze, SizeMaze); -> Affiche le laby
 
 */
 
-void mazeEngine(int **tab, int W, int H, int MATRIX_W, int MATRIX_H)
+void mazeEngine(int **tab, int W, int H, int size)
 {
+	if (W * size > W) W = (W / size);
+	if (H * size > H) H = (H / size);
 	if (W % 2 == 0) W = W - 1;
 	if (H % 2 == 0) H = H - 1;
-	if (W > MATRIX_W) W = MATRIX_W - 1;
-	if (H > MATRIX_H) H = MATRIX_H - 1;
+	int **mazeData = NULL;
+		iniCellData(&mazeData, W, H);
 	
-	// Init metaData
-	int **metaData;
-	metaData = (int **)malloc(sizeof(int *) * H);
-	for (int i = 0; i < H; i++)
-	{
-		metaData[i] = (int *)malloc(sizeof(int) * W);
-	}
-	setMetaData(metaData, tab, W, H);
+		// Init metaData
+		int **metaData;
+		metaData = (int **)malloc(sizeof(int *) * H);
+		for (int i = 0; i < H; i++)
+		{
+			metaData[i] = (int *)malloc(sizeof(int) * W);
+		}
+		setMetaData(metaData, mazeData, W, H);
 
-	// Init setting
-	int case_x = 0, case_y = 0;
-	int delta_x = 0, delta_y = 0;
-	int nb_zone = ((W - 1) * (H - 1)) / 4 - 1;
-	int id1 = 0, id2 = 0;
+		// Init setting
+		int case_x = 0, case_y = 0;
+		int delta_x = 0, delta_y = 0;
+		int nb_zone = ((W - 1) * (H - 1)) / 4 - 1;
+		int id1 = 0, id2 = 0;
 
-	// Create Maze
-	while (nb_zone != 0)
+		// Create Maze
+		while (nb_zone != 0)
 	{
 		// for (int loop = 0; loop < 10000 ; loop++ ){
 		case_x = rand() % (W - 1); // x de la case
@@ -72,14 +74,15 @@ void mazeEngine(int **tab, int W, int H, int MATRIX_W, int MATRIX_H)
 			id2 = metaData[case_y + delta_y][case_x + delta_x];
 			if (id1 != id2 && id1 != -1 && id2 != -1)
 			{
-				tab[case_y][case_x] = 0;
+				mazeData[case_y][case_x] = 0;
 				metaData[case_y][case_x] = id1;
 				nb_zone = nb_zone - 1;
 				updateMetaData(metaData, id1, id2, W, H);
 			}
 		}
 	}
-	free(metaData);
+		free(metaData);
+	printMazeData(mazeData, tab, W, H, size);
 }
 
 // Update MetaData
