@@ -265,8 +265,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	static DonneesImageRGB *header = NULL;
 	switch (evenement){
 		case Initialisation:
-			DataSizeX = MM_W;
-			DataSizeY = MM_H;
+			*DataSizeX = MM_W;
+			*DataSizeY = MM_H;
 			iniGridData(&CellData, *DataSizeX, *DataSizeY);
 			iniColors(&Colors, *DataSizeX, *DataSizeY);
 

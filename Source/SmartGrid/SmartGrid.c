@@ -14,8 +14,8 @@
 //#include "../SmartUI/SmartUI.h"
 
 // Largeur et hauteur par defaut d'une image correspondant a nos criteres
-#define LargeurFenetre 1200
-#define HauteurFenetre 800
+#define LargeurFenetre 1500
+#define HauteurFenetre 1000
 #define MATRIX_H 500
 #define MATRIX_W 1000
 
