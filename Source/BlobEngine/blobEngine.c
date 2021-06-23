@@ -7,7 +7,7 @@
 #define OOBPenality 50
 #define WallPenality 20
 #define FoodBonus 50
-#define EmptyBonus -1
+#define EmptyBonus 0
 
 void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim){
 	if(target_blob->isExpanding){

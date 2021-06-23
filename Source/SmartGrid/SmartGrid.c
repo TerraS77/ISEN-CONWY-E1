@@ -59,6 +59,7 @@ void gestionEvenement(EvenementGfx evenement)
 
 	//Menu Elements
 	static bool pause = true;
+	static bool pauseCache = true;
 	static int MenuWidth = 290;
 	static bool MenuStatus = true;
 	static DonneesImageRGB *header = NULL;
@@ -152,7 +153,7 @@ void gestionEvenement(EvenementGfx evenement)
 				sim.OscilInfluence = 0.5;
 				sim.ramificationRarity = 20;
 				sim.RepMucusMultiplicator = 1;
-				sim.RepSelfMultiplicator = 0.5;
+				sim.RepSelfMultiplicator = 0.9;
 				sim.RepWallMultiplicator = 0.2;
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
@@ -239,7 +240,7 @@ void gestionEvenement(EvenementGfx evenement)
 					CellSize *= 1.4;
 					NeedScrollUpdate = true;
 				}
-				if (etatBoutonSouris() == ScrollDown && CellSize > 4 && !RCD){
+				if (etatBoutonSouris() == ScrollDown && CellSize > 2 && !RCD){
 					CellSize *= 0.6;
 					if(CellSize < 4) CellSize = 4;
 					NeedScrollUpdate = true;
