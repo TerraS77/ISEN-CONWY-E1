@@ -36,8 +36,8 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 	//TXT
 	*nTexts = 13;
 	*texts = (text *)malloc(sizeof(text) * (*nTexts));
-	(*texts)[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, Origin, "Blob", 4);
-	(*texts)[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, Origin, "Engine", 2);
+	(*texts)[0] = newText(RGBwhite, RGBwhite, RGBwhite, 45, Origin, "BLOB", 4);
+	(*texts)[1] = newText(RGBwhite, RGBwhite, RGBwhite, 30, Origin, "ENGINE", 2);
 	(*texts)[2] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "Vivant: 0", 2);
 	(*texts)[3] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "Generation : 0", 2);
 	(*texts)[4] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "X:", 2);
@@ -97,9 +97,9 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 	//TXT
 	*nTexts2 = 3;
 	*texts2 = (text *)malloc(sizeof(text) * (*nTexts2));
-	(*texts2)[0] = newText(RGBwhite, RGBwhite, RGBwhite, 50, new2Dcoord(largeurFenetre() - MenuWidth + 20, hauteurFenetre() - 50), "Blob", 4);
-	(*texts2)[1] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 80), "Engine", 2);
-	(*texts2)[2] = newText(RGBwhite, RGBwhite, RGBwhite, 25, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 350), "Vitesse : ", 2);
+	(*texts2)[0] = newText(RGBwhite, RGBwhite, RGBwhite, 45, Origin, "BLOB", 4);
+	(*texts2)[1] = newText(RGBwhite, RGBwhite, RGBwhite, 30, Origin, "ENGINE", 2);
+	(*texts2)[2] = newText(RGBwhite, RGBwhite, RGBwhite, 25, Origin, "Vitesse : ", 2);
 }
 
 // Afficher le menu de contrôle
@@ -173,8 +173,8 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 
 		// Menu "SETTINGS"
 		whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()));
-		updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 140, hauteurFenetre() - 50));		 // Conway
-		updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 80));		 // Game of life
+		updateText(&texts[0], new2Dcoord(largeurFenetre() - MenuWidth + 50, hauteurFenetre() - 48));		 // Conway
+		updateText(&texts[1], new2Dcoord(largeurFenetre() - MenuWidth + 130, hauteurFenetre() - 82));		 // Game of life
 		updateSlider(&sliders[0], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 305));	 // ramificationRarity
 		updateSlider(&sliders[1], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 380));	 // detectionRadius
 		updateSlider(&sliders[2], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 455));	 // Oscillation
@@ -188,8 +188,8 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 
 		// Menu "SIMULER"
 		whenHoverUI(buttons2, nButtons2, sliders2, nSliders2, new2Dcoord(abscisseSouris(), ordonneeSouris()));
-		updateText(&texts2[0], new2Dcoord(largeurFenetre() - MenuWidth + 140, hauteurFenetre() - 50));		  // Coneway
-		updateText(&texts2[1], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 80));		  // Game of life
+		updateText(&texts2[0], new2Dcoord(largeurFenetre() - MenuWidth + 50, hauteurFenetre() - 48));		  // Coneway
+		updateText(&texts2[1], new2Dcoord(largeurFenetre() - MenuWidth + 130, hauteurFenetre() - 82));		  // Game of life
 		updateSlider(&sliders2[0], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 225));	  // Vitesse
 		updateButton(&buttons2[0], (new2Dcoord(largeurFenetre() - MenuWidth + 150, 40))); // Leave
 		updateButton(&buttons2[1], (new2Dcoord(largeurFenetre() - MenuWidth + 90, 100)));  // Pause
@@ -347,9 +347,10 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Sandbox, false, false);
 			
-			nTexts = 1;
+			nTexts = 2;
 			texts = malloc(sizeof(button)*nTexts);
-			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"BLOB ENGINE", 3);
+			texts[0] = newText(RGBwhite, RGBwhite, RGBwhite, 60, new2Dcoord(0,0),"BLOB", 5);
+			texts[1] = newText(RGBwhite, RGBwhite, RGBwhite, 40, new2Dcoord(0,0),"ENGINE", 3);
 
 			header = lisBMPRGB("#Ressources/header.bmp");
 
@@ -369,7 +370,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 			updateButton(&buttons[10], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 8/12 - CellSize - CellInBetween + ombre));
 			updateButton(&buttons[11], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 3/12 - CellSize - CellInBetween + ombre));
 			updateButton(&buttons[8], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 3/12 - CellSize - CellInBetween + ombre));
-			updateText(&texts[0], new2Dcoord(100, hauteurFenetre() - 75));
+			updateText(&texts[0], new2Dcoord(50, hauteurFenetre() - 60));
+			updateText(&texts[1], new2Dcoord(150, hauteurFenetre() - 110));
 			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()));
 			for (int i = 0; i < nButtons; i++){
 				if(buttons[i].state == 1){
