@@ -126,12 +126,6 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 			}
 		}
 	}else{
-		// int totalFood = 0;
-		// for(int ty = 0; ty < CH; ty++)
-		// 	for(int tx = 0; tx < CW; tx++)
-		// 		if(cellGrid[ty][tx].type == cell_blob && cellGrid[ty][tx].blob_id == target_blob->id)
-		// 			totalFood += cellGrid[ty][tx].food_amount;
-		// if(totalFood == 0) target_blob->isExpanding = true;
 		if(!target_blob->pathIsSet){
 				if(target_blob->path == NULL){
 					target_blob->path = (int**) malloc(sizeof(int*)*CH);
@@ -150,7 +144,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					if(target_blob->path[y][x] && cellGrid[y][x].blob_bm < cellGrid[minBM.y][minBM.x].blob_bm)
 						minBM = new2Dcoord(x,y);
 				target_blob->path[minBM.y][minBM.x] = 0;
-				if(IsStartAndEndLinked(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End) && cellGrid[minBM.y][minBM.x].blob_type != blob_kernel){
+				if(IsStartAndEndLinked(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End) && cellGrid[minBM.y][minBM.x].blob_type != blob_kernel && cellGrid[minBM.y][minBM.x].food_amount == 0){
 					cellGrid[minBM.y][minBM.x] = newCell(cell_mucus, 0, 0, cellGrid[minBM.y][minBM.x].blob_bm);
 					target_blob->path[minBM.y][minBM.x] = 0; 
 				}else{
