@@ -299,12 +299,12 @@ void gestionEvenement(EvenementGfx evenement)
 					CellInBetween = 1;
 					NeedScrollUpdate = true;
 				}
-				if (etatBoutonSouris() == ScrollDown && CellSize >= 1 && !RCD){
-					CellSize *= 0.6;
-					if(CellSize < 3){
+				if (etatBoutonSouris() == ScrollDown && CellSize > 3 && !RCD){
+					if(CellSize * 0,6 < 3){
 						CellSize = 3;
 						CellInBetween = 0;
 					}
+					else CellSize *= 0.6;
 					NeedScrollUpdate = true;
 				}
 
