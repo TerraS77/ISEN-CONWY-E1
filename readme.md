@@ -27,12 +27,12 @@ Il s'agit de la libraire de l'ISEN dans laquelle certaines modifications ont eu 
 
 ## Smart UI
 
-Cette librairie contient l'extension de GFXLib réalisée par l'un des membres du groupe permettant de faciliter la mise en place de boutons, de sliders et de textes.
+Cette librairie contient l'extension de GFXLib que nous avons réalisé permettant de faciliter la mise en place de boutons, de sliders et de textes.
 
 
 ## Smart Grid
 
-Cette librairie contient tout ce qui concerne l'affichage de la grille, le déplacement, le zoom et l'intéraction sur celle-ci.
+Cette librairie gère toute l’interface entre GFXLib et la simulation elle-même, le rendu graphique de la grille de simulation et le déplacement sur celle-ci. Cette librairie permet le rendu dynamique de la simulation en fonction de la position de la souris et du zoom sur la grille avec le rafraichissement de celle-ci. SmartGrid appelle les différentes librairies qui génèrent les différents environnements et fait interface entre la simulation du Blob, le système graphique et le système des évènements et d’entrée utilisateurs.
 
 ## Menu
 
@@ -53,22 +53,23 @@ Cette librairie contient le menu principal et le menu contextuel secondaire à l
 
 - Clic Droit appuyé + déplacement souris : déplacement dans la grille
 - Scroll-Up/Scroll-Down : Zoom/Dezoom de la grille
-- Clic Gauche sur une case de la grille : apparition d'une cellule
-- Touche F : Permet de selectionner la nourriture afin de la poser sur la grille
-- Touche B : Permet de séléctionner le Blob afin de le poser sur la grille
-- Touche W : Permet de séléctionner le mur afin d'en poser sur la grille.
+- Clic Gauche sur une case de la grille : place l’élément sélectionner dans le menu secondaire
+- Touche F : Permet de sélectionner la nourriture afin de la poser sur la grille
+- Touche B : Permet de sélectionner le Blob afin de le poser sur la grille
+- Touche W : Permet de sélectionner le mur afin d'en poser sur la grille.
 
 
 ## Paramètres du Simulation
 
 **Paramètre du Blob**
 - Rareté de Ramification
-- Périmètre de détection de la nourriture
-- Niveau de Répulsivité entre les parties mortes du Blob et le Blob
-- Niveau de Répulsivité entre les murs et le Blob
-- Niveau de Répulsivité entre les parties vivantes du Blob
+- Périmètre de rayon de détection
+- Niveau de Répulsion entre les parties mortes du Blob et le Blob
+- Niveau de Répulsion entre les murs et le Blob
+- Niveau de Répulsion entre les parties vivantes du Blob
 - Niveau d'Attraction du Blob à la nourriture
 - Influence de l'oscillation des autres cellules du Blob sur son développement
+- Niveau d'Attraction du Blob pour le vide
 
 ## Edition de la grille
 
