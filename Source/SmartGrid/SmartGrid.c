@@ -336,6 +336,7 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								pause = true;
 								addType = 0;
 								gen = 0;
 								iniCellData(&CellData, DataSizeX, DataSizeY);
@@ -365,6 +366,7 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								pause = true;
 								addType = 0;
 								gen = 0;
 								iniCellData(&CellData, DataSizeX, DataSizeY);
