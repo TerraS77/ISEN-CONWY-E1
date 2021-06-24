@@ -161,7 +161,7 @@ void gestionEvenement(EvenementGfx evenement)
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						RockPanel(120, WallGrid, DataSizeX, DataSizeY);
 						sim.AtracFoodMultiplicator = 1;
-						sim.detectionRadius = 4;
+						sim.detectionRadius = 6;
 						sim.OscilInfluence = 0.15;
 						sim.ramificationRarity = 20;
 						sim.RepMucusMultiplicator = 0.2;
