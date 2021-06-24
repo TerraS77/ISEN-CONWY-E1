@@ -1,3 +1,15 @@
+/* 
+
+	     _______..___  ___.      ___      .______     .___________.     _______ .______       __   _______  
+	    /       ||   \/   |     /   \     |   _  \    |           |    /  _____||   _  \     |  | |       \ 
+	   |   (----`|  \  /  |    /  ^  \    |  |_)  |   `---|  |----`   |  |  __  |  |_)  |    |  | |  .--.  |
+	    \   \    |  |\/|  |   /  /_\  \   |      /        |  |        |  | |_ | |      /     |  | |  |  |  |
+	.----)   |   |  |  |  |  /  _____  \  |  |\  \----.   |  |        |  |__| | |  |\  \----.|  | |  '--'  |
+	|_______/    |__|  |__| /__/     \__\ | _| `._____|   |__|         \______| | _| `._____||__| |_______/ 
+                                                                                                       
+*/
+
+
 #include <stdlib.h> // Pour pouvoir utiliser exit()
 #include <stdio.h> // Pour pouvoir utiliser printf()
 #include <stdbool.h>
@@ -30,6 +42,7 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+// Gère les évènements
 void gestionEvenement(EvenementGfx evenement)
 {
 	//Matrice de données
@@ -132,6 +145,7 @@ void gestionEvenement(EvenementGfx evenement)
 		OutputCache = menuOutput;
 	}
 
+	// Selecteur de menu
 	if(menuOutput == menu_Main){
 		mainMenu(evenement, &menuOutput, &DataSizeX, &DataSizeY);
 	}else{
@@ -223,8 +237,7 @@ void gestionEvenement(EvenementGfx evenement)
 									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 3)
 										CellData[y][x] = newCell(cell_block, 0, -1, -1);
 
-				//>>>Gestion de la simulation et APPEL<<<
-				//==========================================================================================================================
+				//Gestion de la simulation et APPEL
 				seuil = 1 / ((float) (sliders2->value + 0.1) / (float) sliders2->max);
 				if(!pause){
 					tick++;
@@ -234,7 +247,6 @@ void gestionEvenement(EvenementGfx evenement)
 						gen++;
 					}
 				}
-				//==========================================================================================================================
 
 				//Menu
 				if(MenuStatus==true && MenuWidth<290) MenuWidth+=50;
@@ -318,6 +330,7 @@ void gestionEvenement(EvenementGfx evenement)
 				//Drag&Snap : Relachement du clic
 				if(etatBoutonSouris() == DroiteRelache) RCD = false;
 
+				// Clic
 				if (etatBoutonSouris() == GaucheAppuye){
 					if (menuType == false){
 						switch (whenClickedUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()))){
