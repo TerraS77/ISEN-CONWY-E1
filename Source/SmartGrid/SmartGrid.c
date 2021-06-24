@@ -336,6 +336,7 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								addType = 0;
 								gen = 0;
 								iniCellData(&CellData, DataSizeX, DataSizeY);
 								blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob));
@@ -364,6 +365,7 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								addType = 0;
 								gen = 0;
 								iniCellData(&CellData, DataSizeX, DataSizeY);
 								blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob));
