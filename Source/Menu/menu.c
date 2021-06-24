@@ -271,13 +271,15 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	static int ombre = 10;
 	static int border = 3;
 	static DonneesImageRGB *header = NULL;
+	static DonneesImageRGB *image = NULL;
+
 	switch (evenement){
 		case Initialisation:;
 			loaded = 0;
 			*DataSizeX = MM_W;
 			*DataSizeY = MM_H;
-			iniGridData(&CellData, *DataSizeX, *DataSizeY);
-			iniColors(&Colors, *DataSizeX, *DataSizeY);
+			// iniGridData(&CellData, *DataSizeX, *DataSizeY);
+			// iniColors(&Colors, *DataSizeX, *DataSizeY);
 
 			HcellCap = 100;
 			WcellCap = 100;
@@ -285,72 +287,74 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 			CellInBetween = 0;
 			W_temp = WcellCap * (CellSize + CellInBetween);
 			H_temp = HcellCap * (CellSize + CellInBetween);
-			load(CellData, *DataSizeX, *DataSizeY, Colors, *Action);
+			// load(CellData, *DataSizeX, *DataSizeY, Colors, *Action);
+			
+			image = lisBMPRGB("#Ressources/void.bmp");
 
 			nButtons = 12;
 			buttons = malloc(sizeof(button)*nButtons);
 			buttons[0] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, H_temp,RGBIdle, RGBHover, color_button, 
+				image->largeurImage, image->hauteurImage,RGBIdle, RGBHover, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Laby, false, false);
 			buttons[1] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, H_temp, RGBIdle, RGBHover, color_button, 
+				image->largeurImage, image->hauteurImage, RGBIdle, RGBHover, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Env, false, false);
 			buttons[2] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, H_temp, RGBIdle, RGBHover, color_button, 
+				image->largeurImage, image->hauteurImage, RGBIdle, RGBHover, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Void, false, false);
 			buttons[3] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, H_temp, RGBIdle, RGBHover, color_button, 
+				image->largeurImage, image->hauteurImage, RGBIdle, RGBHover, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Sandbox, false, false);
 			buttons[4] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, 40, background, background, background, 
+				image->largeurImage, 40, background, background, background, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, 
-				new2Dcoord(largeurFenetre() * 1/3 + (W_temp)/2 - 6,  hauteurFenetre() * 0.55),"Labyrinthe", 2), 
+				new2Dcoord(largeurFenetre() * 1/3 + (image->largeurImage)/2 - 6,  hauteurFenetre() * 0.55),"Labyrinthe", 2), 
 				menu_Laby, false, false);
 			buttons[5] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, 40, background, background, background, 
+				image->largeurImage, 40, background, background, background, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, 
-				new2Dcoord(largeurFenetre() * 11/17 + (W_temp)/2 - 6,  hauteurFenetre() * 0.50),"Environnement", 2), 
+				new2Dcoord(largeurFenetre() * 11/17 + (image->largeurImage)/2 - 6,  hauteurFenetre() * 0.50),"Environnement", 2), 
 				menu_Env, false, false);
 			buttons[6] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, 40, background, background, background, 
+				image->largeurImage, 40, background, background, background, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, 
-				new2Dcoord(largeurFenetre() * 1/3 + (W_temp)/2 - 6,  hauteurFenetre() * 0.22),"Vide", 2), 
+				new2Dcoord(largeurFenetre() * 1/3 + (image->largeurImage)/2 - 6,  hauteurFenetre() * 0.22),"Vide", 2), 
 				menu_Void, false, false);
 			buttons[7] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp, 40, background, background, background, 
+				image->largeurImage, 40, background, background, background, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, 
-				new2Dcoord(largeurFenetre() * 11/17 + (W_temp)/2 - 6,  hauteurFenetre() * 0.22),"Custom", 2), 
+				new2Dcoord(largeurFenetre() * 11/17 + (image->largeurImage)/2 - 6,  hauteurFenetre() * 0.22),"Custom", 2), 
 				menu_Sandbox, false, false);
 			buttons[9] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp + border, H_temp + border,color_button, RGBClick, color_button, 
+				image->largeurImage + border, image->hauteurImage + border,color_button, RGBClick, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Laby, false, false);
 			buttons[10] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp + border, H_temp + border, color_button, RGBClick, color_button, 
+				image->largeurImage + border, image->hauteurImage + border, color_button, RGBClick, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Env, false, false);
 			buttons[11] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp + border, H_temp + border, color_button, RGBClick, color_button, 
+				image->largeurImage + border, image->hauteurImage + border, color_button, RGBClick, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Void, false, false);
 			buttons[8] = newButton(
 				new2Dcoord(0, 0), 
-				W_temp + border, H_temp + border, color_button, RGBClick, color_button, 
+				image->largeurImage + border, image->hauteurImage + border, color_button, RGBClick, color_button, 
 				newText(RGBwhite, RGBwhite, RGBwhite, 35, new2Dcoord(0,0),"", 1), 
 				menu_Sandbox, false, false);
 			
@@ -365,20 +369,25 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 			break;
 
 		case Temporisation:
-			updateButton(&buttons[0], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween));
-			updateButton(&buttons[1], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween));
-			updateButton(&buttons[2], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween));
-			updateButton(&buttons[3], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween));
-			updateButton(&buttons[4], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween - H_temp/2 - buttons[4].height/2));
-			updateButton(&buttons[5], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 8/12 - CellSize - CellInBetween - H_temp/2 - buttons[5].height/2));
-			updateButton(&buttons[6], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween - H_temp/2 - buttons[6].height/2));
-			updateButton(&buttons[7], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween, hauteurFenetre() * 3/12 - CellSize - CellInBetween - H_temp/2 - buttons[7].height/2));
-			updateButton(&buttons[9], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 8/12 - CellSize - CellInBetween + ombre));
-			updateButton(&buttons[10], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 8/12 - CellSize - CellInBetween + ombre));
-			updateButton(&buttons[11], new2Dcoord(largeurFenetre() * 1/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 3/12 - CellSize - CellInBetween + ombre));
-			updateButton(&buttons[8], new2Dcoord(largeurFenetre() * 2/3 - CellSize - CellInBetween + ombre, hauteurFenetre() * 3/12 - CellSize - CellInBetween + ombre));
-			updateText(&texts[0], new2Dcoord(50, hauteurFenetre() - 60));
-			updateText(&texts[1], new2Dcoord(150, hauteurFenetre() - 110));
+			updateButton(&buttons[0], new2Dcoord(largeurFenetre() * 1/3, hauteurFenetre() * 8/12));
+			updateButton(&buttons[1], new2Dcoord(largeurFenetre() * 2/3, hauteurFenetre() * 8/12));
+			updateButton(&buttons[2], new2Dcoord(largeurFenetre() * 1/3, hauteurFenetre() * 3/12));
+			updateButton(&buttons[3], new2Dcoord(largeurFenetre() * 2/3, hauteurFenetre() * 3/12));
+			
+			// Laby / Env / Custom / Void
+			updateButton(&buttons[4], new2Dcoord(largeurFenetre() * 1/3, hauteurFenetre() * 8/12 - (image->hauteurImage)/2 - buttons[4].height/2));
+			updateButton(&buttons[5], new2Dcoord(largeurFenetre() * 2/3, hauteurFenetre() * 8/12 - (image->hauteurImage)/2 - buttons[5].height/2));
+			updateButton(&buttons[6], new2Dcoord(largeurFenetre() * 1/3, hauteurFenetre() * 3/12 - (image->hauteurImage)/2 - buttons[6].height/2));
+			updateButton(&buttons[7], new2Dcoord(largeurFenetre() * 2/3, hauteurFenetre() * 3/12 - (image->hauteurImage)/2 - buttons[7].height/2));
+			
+			//boutons ombres
+			updateButton(&buttons[9], new2Dcoord(largeurFenetre() * 1/3 + ombre, hauteurFenetre() * 8/12 + ombre));
+			updateButton(&buttons[10], new2Dcoord(largeurFenetre() * 2/3 + ombre, hauteurFenetre() * 8/12 + ombre));
+			updateButton(&buttons[11], new2Dcoord(largeurFenetre() * 1/3 + ombre, hauteurFenetre() * 3/12 + ombre));
+			updateButton(&buttons[8], new2Dcoord(largeurFenetre() * 2/3 + ombre, hauteurFenetre() * 3/12 + ombre));
+			
+			updateText(&texts[0], new2Dcoord(50, hauteurFenetre() - 60));//Blob
+			updateText(&texts[1], new2Dcoord(150, hauteurFenetre() - 110));//Engine
 			whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()));
 			for (int i = 0; i < nButtons; i++){
 				if(buttons[i].state == 1){
@@ -416,20 +425,34 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 			if(loaded){
 				ecrisImage(0, hauteurFenetre() - header->hauteurImage, header->largeurImage, header->hauteurImage, header->donneesRGB);
 				printUI(buttons, nButtons, sliders, nSliders, texts, nTexts);
-				for (int i = 0; i < 2; i++){
-					for (int j = 0; j < 2; j++){
-						for (int y = 0; y < HcellCap; y++){
-							for (int x = 0; x < WcellCap; x++){
-								int LBCx = largeurFenetre() * (1 + i)/3 - W_temp/2 + (x * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
-								int LBCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + ((y + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
-								int RTCx = largeurFenetre() * (1 + i)/3  - W_temp/2 + ((x + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
-								int RTCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + (y * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
-								CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(Colors[y][x].R, Colors[y][x].G, Colors[y][x].B);
-								if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
-							}
-						}
+				// for (int i = 0; i < 2; i++){
+				// 	for (int j = 0; j < 2; j++){
+				// 		for (int y = 0; y < HcellCap; y++){
+				// 			for (int x = 0; x < WcellCap; x++){
+				// 				int LBCx = largeurFenetre() * (1 + i)/3 - W_temp/2 + (x * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
+				// 				int LBCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + ((y + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
+				// 				int RTCx = largeurFenetre() * (1 + i)/3  - W_temp/2 + ((x + 1) * (CellSize + CellInBetween) - (CellSize + CellInBetween));
+				// 				int RTCy = hauteurFenetre() * (3 + j * 5)/12 - H_temp/2 + (y * (CellSize + CellInBetween) + CellInBetween - (CellSize + CellInBetween));
+				// 				CellData[y][x] == 0 ? couleurCourante(20, 20, 20) : couleurCourante(Colors[y][x].R, Colors[y][x].G, Colors[y][x].B);
+				// 				if(CellData[y][x] || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
+				// 			}
+				// 		}
+				// 	}
+				// }
+				for (int i = 0; i < 2; i++)
+				{
+					for (int j = 0; j < 2; j++)
+					{
+						if(i == 0 && j == 0) image = lisBMPRGB("#Ressources/void.bmp");
+						else if(i == 1 && j == 0) image = lisBMPRGB("#Ressources/custom.bmp");
+						else if(i == 0 && j == 1) image = lisBMPRGB("#Ressources/maze.bmp");
+						else if(i == 1 && j == 1) image = lisBMPRGB("#Ressources/env.bmp");
+						ecrisImage(largeurFenetre() * (1 + i)/3 -image->largeurImage/2, hauteurFenetre() * (3 + j * 5)/12 - image->hauteurImage/2, image->largeurImage, image->hauteurImage, image->donneesRGB);
 					}
+					
 				}
+				
+					
 				couleurCourante(255,0,0);
 				circle(largeurFenetre()-40, hauteurFenetre()-40, 28);
 				sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 29 ? couleurCourante(255,0,0) : couleurCourante(28, 28, 28);
@@ -447,8 +470,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 					case menu_Laby:
 						//printf("menu_Laby\n");
 						free(buttons);
-						freeGridData(&CellData, *DataSizeX, *DataSizeY);
-						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						//freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						//freeColors(&Colors, *DataSizeX, *DataSizeY);
 						free(texts);
 						libereDonneesImageRGB(&header);
 						*Action = menu_Laby;
@@ -456,8 +479,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 					case menu_Env:
 						//printf("menu_Env\n");
 						free(buttons);
-						freeGridData(&CellData, *DataSizeX, *DataSizeY);
-						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						//freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						//freeColors(&Colors, *DataSizeX, *DataSizeY);
 						free(texts);
 						libereDonneesImageRGB(&header);
 						*Action = menu_Env;
@@ -466,8 +489,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						//printf("menu_Void\n");
 						*Action = menu_Void;
 						free(buttons);
-						freeGridData(&CellData, *DataSizeX, *DataSizeY);
-						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						//freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						//freeColors(&Colors, *DataSizeX, *DataSizeY);
 						free(texts);
 						libereDonneesImageRGB(&header);
 						break;
@@ -475,8 +498,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 						//printf("menu_Sandbox\n");
 						*Action = menu_Sandbox;
 						free(buttons);
-						freeGridData(&CellData, *DataSizeX, *DataSizeY);
-						freeColors(&Colors, *DataSizeX, *DataSizeY);
+						//freeGridData(&CellData, *DataSizeX, *DataSizeY);
+						//freeColors(&Colors, *DataSizeX, *DataSizeY);
 						free(texts);
 						libereDonneesImageRGB(&header);
 						break;
@@ -486,8 +509,8 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 				if (sqrt(pow(abscisseSouris()-(largeurFenetre()-40), 2) + pow(ordonneeSouris()-(hauteurFenetre()-40), 2)) <= 30){
 					//printf("Quitter\n");
 					free(buttons);
-					freeGridData(&CellData, *DataSizeX, *DataSizeY);
-					freeColors(&Colors, *DataSizeX, *DataSizeY);
+					//freeGridData(&CellData, *DataSizeX, *DataSizeY);
+					//freeColors(&Colors, *DataSizeX, *DataSizeY);
 					free(texts);
 					libereDonneesImageRGB(&header);
 					termineBoucleEvenements();
