@@ -125,7 +125,7 @@ void gestionEvenement(EvenementGfx evenement)
 		FreePointer(&buttons2);
 		FreePointer(&sliders2);
 		FreePointer(&texts2);
-
+		FreePointer(&blobs);
 		if(CellData != NULL) freeCellData(&CellData, DataSizeX, DataSizeY);
 		if(WallGrid != NULL) freeGridData(&WallGrid, DataSizeX, DataSizeY);
 		evenement = Initialisation;
@@ -145,6 +145,14 @@ void gestionEvenement(EvenementGfx evenement)
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
+						sim.AtracFoodMultiplicator = 1;
+						sim.detectionRadius = 4;
+						sim.OscilInfluence = 0.3;
+						sim.ramificationRarity = 15;
+						sim.RepMucusMultiplicator = 0.2;
+						sim.RepSelfMultiplicator = 0.7;
+						sim.RepWallMultiplicator = 0.7;
+						sim.AtracEmptyMultiplicator = 0.2;
 						break;
 					case menu_Env :
 						DataSizeX = 600;
@@ -152,12 +160,28 @@ void gestionEvenement(EvenementGfx evenement)
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						RockPanel(120, WallGrid, DataSizeX, DataSizeY);
+						sim.AtracFoodMultiplicator = 1;
+						sim.detectionRadius = 4;
+						sim.OscilInfluence = 0.15;
+						sim.ramificationRarity = 20;
+						sim.RepMucusMultiplicator = 0.2;
+						sim.RepSelfMultiplicator = 0.4;
+						sim.RepWallMultiplicator = 0.7;
+						sim.AtracEmptyMultiplicator = 0.3;
 						break;
 					case menu_Void :
 						DataSizeX = 1000;
 						DataSizeY = 500;
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
+						sim.AtracFoodMultiplicator = 1;
+						sim.detectionRadius = 4;
+						sim.OscilInfluence = 0.15;
+						sim.ramificationRarity = 20;
+						sim.RepMucusMultiplicator = 0.2;
+						sim.RepSelfMultiplicator = 0.4;
+						sim.RepWallMultiplicator = 0.7;
+						sim.AtracEmptyMultiplicator = 0.3;
 						break;
 					case menu_Sandbox :
 						DataSizeX = 395;
@@ -169,6 +193,14 @@ void gestionEvenement(EvenementGfx evenement)
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
 						RockPanel(120, EnvData, DataSizeX, DataSizeY);
 						for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(EnvData[y][x]) WallGrid[y][x] = 0;
+						sim.AtracFoodMultiplicator = 1;
+						sim.detectionRadius = 4;
+						sim.OscilInfluence = 0.15;
+						sim.ramificationRarity = 20;
+						sim.RepMucusMultiplicator = 0.2;
+						sim.RepSelfMultiplicator = 0.4;
+						sim.RepWallMultiplicator = 0.7;
+						sim.AtracEmptyMultiplicator = 0.3;
 						break;
 				}
 				if(menuOutput != menu_Void) for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
@@ -176,14 +208,6 @@ void gestionEvenement(EvenementGfx evenement)
 				DeltaY = DataSizeY/4;
 				if(blobs != NULL) free(blobs);
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
-				//SIM
-				sim.AtracFoodMultiplicator = 1;
-				sim.detectionRadius = 10;
-				sim.OscilInfluence = 0.5;
-				sim.ramificationRarity = 20;
-				sim.RepMucusMultiplicator = 1;
-				sim.RepSelfMultiplicator = 0.9;
-				sim.RepWallMultiplicator = 0.2;
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
 				demandeTemporisation(5);
@@ -225,8 +249,13 @@ void gestionEvenement(EvenementGfx evenement)
 						//COLOR SELECTION
 						int colorGrad = CellData[y][x].blob_bm > 230 ? 230 : CellData[y][x].blob_bm;
 						CellData[y][x].blob_bm < 0 ? couleurCourante(20, 20, 20) : couleurCourante(colorGrad + 20, colorGrad + 20, 20);
+						if(CellData[y][x].food_amount>0) couleurCourante(colorGrad + 20, colorGrad + 20, 250 - colorGrad);
 						if(CellData[y][x].type == cell_food) couleurCourante(20, 20, 255);
 						if(CellData[y][x].type == cell_block) couleurCourante(240, 240, 240);
+						if(CellData[y][x].type == cell_mucus){
+							int CG = CellData[y][x].mucus_amount < 100 ? CellData[y][x].mucus_amount : 100;
+							couleurCourante(20+CG, 20+CG, 20+CG);
+						}
 						//PRINTING
 						if(CellData[y][x].type != cell_empty || pause) rectangle(LBCx, LBCy, RTCx, RTCy);
 					}
@@ -242,7 +271,7 @@ void gestionEvenement(EvenementGfx evenement)
 					if(((largeurFenetre() - MenuWidth -70< abscisseSouris()) &&	((hauteurFenetre() - 70)<ordonneeSouris())));
 					else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
-						if(addType == 1){
+						if(addType == 1 && getNeyboors(CellData, DataSizeX, DataSizeY,new2Dcoord(Sx,Sy),cell_block,3)<16 && CellData[Sy][Sx].type != cell_block){
 							blobNumber++;
 							blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
 							blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);

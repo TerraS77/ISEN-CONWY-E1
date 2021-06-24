@@ -38,6 +38,11 @@ typedef struct{
     ant *ants;
     int nAnts;
     bool isExpanding;
+    coord2D Kernel_Start;
+    coord2D Food_End;
+    bool pathIsSet;
+    int **path;
+    int pathSize;
 }blob_blob;
 
 typedef struct{
@@ -47,6 +52,7 @@ typedef struct{
     float RepWallMultiplicator;
     float RepSelfMultiplicator;
     float AtracFoodMultiplicator;
+    float AtracEmptyMultiplicator;
     float OscilInfluence;
 }simulation;
 
@@ -54,13 +60,15 @@ typedef struct{
 
 void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim);
 
+bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end);
 // void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
 // void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
-void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint);
+int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim);
+// void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint);
 vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
 int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
 vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id);
-coord2D getPeriphPoint(cell **cellGrid, int CW, int CH, int id, vector center, float targetAngle, float teta);
+// coord2D getPeriphPoint(cell **cellGrid, int CW, int CH, int id, vector center, float targetAngle, float teta);
 vector crunchSpeed(vector vect, int speed);
 vector getOscilatorVect(cell **cellGrid, int CW, int CH, coord2D target, float targetOscillation, int id);
 blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim);

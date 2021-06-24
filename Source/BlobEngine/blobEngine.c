@@ -10,6 +10,21 @@
 #define EmptyBonus 0
 
 void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim){
+	cell **cacheData = NULL;
+	iniCellData(&cacheData, CW,CH);
+	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) cacheData[y][x] = cellGrid[y][x];
+	for(int x = 0; x<CW; x++){
+		for(int y = 0; y<CH; y++){
+			if(cellGrid[y][x].type == cell_food && getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, 1) > 0){
+				cacheData[y][x].type = cell_blob;
+				cacheData[y][x].blob_bm = 150;
+				cacheData[y][x].blob_id = target_blob->id;
+				target_blob->isExpanding = false;
+			}
+		}
+	}
+	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) cellGrid[y][x] = cacheData[y][x];
+	freeCellData(&cacheData,CW,CH);
 	if(target_blob->isExpanding){
 		int actAnt = 0;
 		for(int i = 0; i < target_blob->nAnts; i++){
@@ -25,10 +40,27 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					vector wall = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_block, sim.detectionRadius);
 					vector self = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_blob, sim.detectionRadius);
 					vector food = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_food, sim.detectionRadius);			
+					vector empty = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_empty, sim.detectionRadius);	
 					vector oscil = getOscilatorVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), target_blob->ants[i].oscillation, target_blob->ants[i].id);
-					// printf("V : %f, %f\nVmucus : %f, %f\n Vwall : %f, %f\n Vself : %f, %f\n Vfood : %f, %f\n Voscil : %f, %f\n", target_blob->ants[i].moov.x, target_blob->ants[i].moov.y, mucus.x*sim.RepMucusMultiplicator, mucus.y*sim.RepMucusMultiplicator, wall.x*sim.RepWallMultiplicator, wall.y*sim.RepWallMultiplicator, self.x*sim.RepSelfMultiplicator, self.y*sim.RepSelfMultiplicator, food.x*sim.AtracFoodMultiplicator, food.y*sim.AtracFoodMultiplicator, oscil.x*sim.OscilInfluence, oscil.y*sim.OscilInfluence);
-					target_blob->ants[i].moov.x -= mucus.x*sim.RepMucusMultiplicator + wall.x*sim.RepWallMultiplicator + self.x*sim.RepSelfMultiplicator - food.x*sim.AtracFoodMultiplicator - oscil.x*sim.OscilInfluence;
-					target_blob->ants[i].moov.y -= mucus.y*sim.RepMucusMultiplicator + wall.y*sim.RepWallMultiplicator + self.y*sim.RepSelfMultiplicator - food.y*sim.AtracFoodMultiplicator - oscil.y*sim.OscilInfluence;
+					vector otherAnts;
+					otherAnts.x = 0;
+					otherAnts.y = 0;
+					for(int j = 0; j < target_blob->nAnts; j++){
+						if(sqrtf(powf(target_blob->ants[i].x-target_blob->ants[j].x,2)+powf(target_blob->ants[i].y-target_blob->ants[j].y,2)) <= sim.detectionRadius){
+							otherAnts.x += cosf(atan2f(target_blob->ants[i].y-target_blob->ants[j].y, target_blob->ants[i].x-target_blob->ants[j].x));
+							otherAnts.y += sinf(atan2f(target_blob->ants[i].y-target_blob->ants[j].y, target_blob->ants[i].x-target_blob->ants[j].x));
+						}
+					}
+					otherAnts = crunchSpeed(otherAnts, 1);
+					printf("mucus X = %f mucus Y = %f\n",mucus.x,mucus.y);
+					printf("wall X = %f wall Y = %f\n",wall.x,wall.y);
+					printf("self X = %f self Y = %f\n",self.x,self.y);
+					printf("food X = %f food Y = %f\n",food.x,food.y);
+					printf("empty X = %f empty Y = %f\n",empty.x,empty.y);
+					printf("oscil X = %f oscil Y = %f\n",oscil.x,oscil.y);
+					printf("otherAnts X = %f otherAnts Y = %f\n",mucus.x,mucus.y);
+					target_blob->ants[i].moov.x -= mucus.x*sim.RepMucusMultiplicator + wall.x*sim.RepWallMultiplicator + self.x*sim.RepSelfMultiplicator + otherAnts.x*sim.RepSelfMultiplicator - food.x*sim.AtracFoodMultiplicator - oscil.x*sim.OscilInfluence - empty.x*sim.AtracEmptyMultiplicator;
+					target_blob->ants[i].moov.y -= mucus.y*sim.RepMucusMultiplicator + wall.y*sim.RepWallMultiplicator + self.y*sim.RepSelfMultiplicator + otherAnts.y*sim.RepSelfMultiplicator - food.y*sim.AtracFoodMultiplicator - oscil.y*sim.OscilInfluence - empty.y*sim.AtracEmptyMultiplicator;
 					target_blob->ants[i].moov = crunchSpeed(target_blob->ants[i].moov, 1);
 					float xCache = target_blob->ants[i].x;
 					float yCache = target_blob->ants[i].y;
@@ -53,21 +85,20 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 						target_blob->ants[i].oscillation -= WallPenality;
 						target_blob->ants[i].x = xCache;
 						target_blob->ants[i].y = yCache;
-					}else if(cellGrid[fY][fX].type == cell_food){
+					}else if(getNeyboors(cellGrid, CW, CH, new2Dcoord(fX,fY), cell_food, 1) > 0){
 						target_blob->ants[i].oscillation += FoodBonus;
 						target_blob->isExpanding = false;
+						target_blob->Food_End = new2Dcoord(fX,fY);
 					}else if(cellGrid[fY][fX].type == cell_empty) target_blob->ants[i].oscillation += EmptyBonus;
 					fX = (int)floorf(target_blob->ants[i].x);
 					fY = (int)floorf(target_blob->ants[i].y);
 					if(cellGrid[fY][fX].type == cell_blob && target_blob->ants[i].t>50 && target_blob->ants[i].ttl<500) target_blob->ants[i].ttl = 0;
 					else{
-						if(cellGrid[fY][fX].type == cell_blob) cellGrid[fY][fX].blob_bm += target_blob->ants[i].ttl;
-						else cellGrid[fY][fX] = newBlobCell(cellGrid, cellGrid[fY][fX].food_amount, blob_vein, target_blob->ants[i].id, -1, target_blob->ants[i].ttl, cellGrid[fY][fX].mucus_amount, new2Dcoord(fX, fY), target_blob->ants[i].oscillation);
-						if(rand()%sim.ramificationRarity == 0 && target_blob->ants[i].t>target_blob->ants[i].ttl/50){
+						if(rand()%sim.ramificationRarity == 0){ // && 
 							int iCell = 0;
-							for(int ty = -sim.ramificationRarity; ty <= sim.ramificationRarity ; ty++){
-								for(int tx = -sim.ramificationRarity; tx <= sim.ramificationRarity; tx++){
-									if((fX+tx) > 0 && (fX+tx) < CW && (fY+ty) > 0 && (fY+ty) < CH && !(tx == 0 && ty == 0))
+							for(int ty = -sim.detectionRadius; ty <= sim.detectionRadius ; ty++){
+								for(int tx = -sim.detectionRadius; tx <= sim.detectionRadius; tx++){
+									if((fX+tx) >= 0 && (fX+tx) < CW && (fY+ty) >= 0 && (fY+ty) < CH && !(tx == 0 && ty == 0))
 										if(cellGrid[fY+ty][fX+tx].type == cell_empty)
 											iCell += getNeyboors(cellGrid, CW, CH, new2Dcoord(fX+tx, fY+ty), cell_blob, sim.detectionRadius) > 0 ? 0 : 1;
 								}
@@ -75,9 +106,11 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 							if(iCell > 0){
 								float newVx = target_blob->ants[i].moov.x + (float)((10.00 - (rand()%20))/10.0);
 								float newVy = target_blob->ants[i].moov.y + (float)((10.00 - (rand()%20))/10.0);
-								newAnt(&target_blob->ants, &target_blob->nAnts, new2Dcoord(target_blob->ants[i].x,target_blob->ants[i].y), newVx, newVy, target_blob->ants[i].ttl/1.5, target_blob->ants[i].oscillation, target_blob->id, target_blob->ants[i].ramR);	
+								newAnt(&target_blob->ants, &target_blob->nAnts, new2Dcoord(target_blob->ants[i].x,target_blob->ants[i].y), newVx, newVy, target_blob->ants[i].ttl/1.5, target_blob->ants[i].oscillation, target_blob->id, sim.ramificationRarity);	
 							}
 						}
+						if(cellGrid[fY][fX].type == cell_blob) cellGrid[fY][fX].blob_bm += target_blob->ants[i].ttl;
+						else cellGrid[fY][fX] = newBlobCell(cellGrid, cellGrid[fY][fX].food_amount, blob_vein, target_blob->ants[i].id, -1, target_blob->ants[i].ttl, cellGrid[fY][fX].mucus_amount, new2Dcoord(fX, fY), target_blob->ants[i].oscillation);
 					}
 				}
 			}
@@ -85,33 +118,45 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 		if(actAnt == 0){
 			for(int i = 0; i<1; i++){
 				target_blob->nAnts = 0;
-				vector center = getBiomassCenter(cellGrid, CW, CH, target_blob->id);
 				coord2D newStart;
-				// vector osciVect = getOscilatorVect(cellGrid, CW, CH, new2Dcoord((int)floorf(center.x),(int)floorf(center.y)), 0, target_blob->id);
-				vector osciVect;
-				getEscapeVector(cellGrid, CW, CH, new2Dcoord((int)floorf(center.x),(int)floorf(center.y)), target_blob->id, &osciVect, &newStart);
-					//osciVect.x += (float)((10.00 - (rand()%20)));
-					//osciVect.y += (float)((10.00 - (rand()%20)));
-					//osciVect = crunchSpeed(osciVect, 1);
-					//newStart = getPeriphPoint(cellGrid, CW, CH, target_blob->id, center, atan2f(osciVect.y, osciVect.x), 0.1);
-				// if(newStart.x == -1 && newStart.y == -1){
-				// 	newStart = new2Dcoord((int)floorf(center.x),(int)floorf(center.y));
-				// 	printf("DEFAUT-1");
-				// }
-				//osciVect.x += (float)((10.00 - (rand()%20)));
-				//osciVect.y += (float)((10.00 - (rand()%20)));
-				printf("%d, %d\n", newStart.x, newStart.y);
-				// osciVect = crunchSpeed(osciVect, 1);
-				newAnt(&target_blob->ants, &target_blob->nAnts, new2Dcoord(newStart.x,newStart.y), osciVect.x, osciVect.y, 400, cellGrid[newStart.y][newStart.x].blob_oscillation, target_blob->id, 100);
+				vector newVect;
+				int score = getBestStartingPoint(cellGrid, CW, CH, target_blob->id, &newVect, &newStart, sim);
+				//printf("x:%d y:%d score:%d\n", newStart.x, newStart.y, score);
+				newAnt(&target_blob->ants, &target_blob->nAnts, new2Dcoord(newStart.x,newStart.y), newVect.x, newVect.y, score/2 + 200 > 400 ? 400 : score/2 + 200, cellGrid[newStart.y][newStart.x].blob_oscillation, target_blob->id, sim.ramificationRarity);
 			}
 		}
 	}else{
-		int totalFood = 0;
-		for(int ty = 0; ty < CH; ty++)
-			for(int tx = 0; tx < CW; tx++)
-				if(cellGrid[ty][tx].type == cell_blob && cellGrid[ty][tx].blob_id == target_blob->id)
-					totalFood += cellGrid[ty][tx].food_amount;
-		if(totalFood == 0) target_blob->isExpanding = true;
+		// int totalFood = 0;
+		// for(int ty = 0; ty < CH; ty++)
+		// 	for(int tx = 0; tx < CW; tx++)
+		// 		if(cellGrid[ty][tx].type == cell_blob && cellGrid[ty][tx].blob_id == target_blob->id)
+		// 			totalFood += cellGrid[ty][tx].food_amount;
+		// if(totalFood == 0) target_blob->isExpanding = true;
+		if(!target_blob->pathIsSet){
+				if(target_blob->path == NULL){
+					target_blob->path = (int**) malloc(sizeof(int*)*CH);
+					for(int y = 0; y<CH; y++) target_blob->path[y] = (int*) malloc(sizeof(int)*CW);
+					for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++){
+						if(target_blob->path[y][x] = cellGrid[y][x].blob_id == target_blob->id){
+							target_blob->path[y][x] = 1;
+							target_blob->pathSize++;
+						}else target_blob->path[y][x] = 0; 
+					}
+				}
+				// exit(EXIT_SUCCESS);
+				coord2D minBM = target_blob->Kernel_Start;
+				for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) 
+					if(target_blob->path[y][x] && cellGrid[y][x].blob_bm < cellGrid[minBM.y][minBM.x].blob_bm)
+						minBM = new2Dcoord(x,y);
+				target_blob->path[minBM.y][minBM.x] = 0;
+				if(IsStartAndEndLinked(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End) && cellGrid[minBM.y][minBM.x].blob_type != blob_kernel) cellGrid[minBM.y][minBM.x] = newCell(cell_mucus, 0, 0, cellGrid[minBM.y][minBM.x].blob_bm);
+				else{
+					target_blob->path[minBM.y][minBM.x] = 1;
+					cellGrid[minBM.y][minBM.x].blob_bm *= 1.5;
+				}
+			// target_blob->pathSize--;
+			// if(target_blob->pathSize <= 0) target_blob->pathIsSet = true;
+		}
 	}
 }
 
@@ -123,6 +168,31 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 
 // }
 
+bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end){
+	int **Pathinding;
+	Pathinding = (int**) malloc(sizeof(int*)*CH);
+	for(int y = 0; y<CH; y++) Pathinding[y] = (int*) malloc(sizeof(int)*CW);
+	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) Pathinding[y][x] = tab[y][x];
+	Pathinding[start.y][start.x] = 2;
+	int change;
+	do{
+		change = 0;
+		for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++){
+			if(Pathinding[y][x] == 1){
+				int DN = 0;
+				for(int ty = -1; ty <= 1 ; ty++) for(int tx = -1; tx <= 1; tx++)
+					if((x+tx) > 0 && (x+tx) < CW && (y+ty) > 0 && (y+ty) < CH && !(x == tx && y == ty))
+						if(Pathinding[y+ty][x+tx] == 2) DN++;
+				if(DN>0){
+					Pathinding[y][x] = 2;
+					change++;
+				}
+			}
+		}
+		// printf("changes = %d\n", change);
+	}while(change != 0);
+	return Pathinding[end.y][end.x] == 2;
+}
 vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius){
 	vector newVect;
 	newVect.x = 0;
@@ -131,9 +201,9 @@ vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType
 		for(int tx = -radius; tx <= radius; tx++){
 			if((target.x+tx) > 0 && (target.x+tx) < CW && (target.y+ty) > 0 && (target.y+ty) < CH && !(target.x == tx && target.y == ty)){
 				if(cellGrid[target.y+ty][target.x+tx].type == type){
-					newVect.x += cosf(atan2f(ty, tx));
-					newVect.y += sinf(atan2f(ty, tx));
-					if(cellGrid[target.y+ty][target.x+tx].type == cell_food) printf("FOOD : %d %d\n", target.x+tx, target.y+ty);
+					newVect.x += cosf(atan2f(ty, tx))*sqrtf(powf(tx,2)+powf(ty,2));
+					newVect.y += sinf(atan2f(ty, tx))*sqrtf(powf(tx,2)+powf(ty,2));
+					//printf("FOOD : %d, %d\n",target.x+tx,target.y+ty);
 				}
 			}
 		}
@@ -141,37 +211,70 @@ vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType
 	if(newVect.x != 0 && newVect.y != 0) newVect = crunchSpeed(newVect, 1);
 	return newVect;
 }
-void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint){
-	vector resultVect;
-	coord2D out;
-	coord2D select;
-	select.x = CW;
-	select.y = CH;
-	float angle = (2*M_PI)/20;
-	for(int i = 0; i<21; i++){
-		out = getPeriphPoint(cellGrid, CW, CH, id, resultVect, angle*i, angle);
-		printf(" out.x = %d out.y = %d\n", out.x, out.y);
-		if(sqrtf(pow(target.x - out.x,2) + pow(target.y - out.y,2))<sqrtf(pow(target.x - select.x,2) + pow(target.y - select.y,2)) || out.x==-1){
-			resultVect.x = cosf(angle*i);
-			resultVect.y = sinf(angle*i);
-			select=out;
-			printf("%f, %f, %f = %f (%f)\n", angle*i, resultVect.x, resultVect.y, atan2f(resultVect.y, resultVect.x), sqrt(pow(target.x - out.x,2) + pow(target.y - out.y,2)));
+// void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint){
+// 	vector resultVect;
+// 	coord2D out;
+// 	coord2D select;
+// 	select.x = CW;
+// 	select.y = CH;
+// 	float angle = (2*M_PI)/20;
+// 	for(int i = 0; i<21; i++){
+// 		out = getPeriphPoint(cellGrid, CW, CH, id, resultVect, angle*i, angle);
+// 		printf(" out.x = %d out.y = %d\n", out.x, out.y);
+// 		if(sqrtf(pow(target.x - out.x,2) + pow(target.y - out.y,2))<sqrtf(pow(target.x - select.x,2) + pow(target.y - select.y,2)) || out.x==-1){
+// 			resultVect.x = cosf(angle*i);
+// 			resultVect.y = sinf(angle*i);
+// 			select=out;
+// 			printf("%f, %f, %f = %f (%f)\n", angle*i, resultVect.x, resultVect.y, atan2f(resultVect.y, resultVect.x), sqrt(pow(target.x - out.x,2) + pow(target.y - out.y,2)));
+// 		}
+// 	}
+// 	resultVect = crunchSpeed(resultVect, 1);
+// 	printf("%f, %f, %f\n",resultVect.x, resultVect.y,atan2f(resultVect.y,resultVect.x));
+// 	printf("cos : %f sin : %f \n", cosf(M_PI), sinf(M_PI));
+	
+// 	*escapePoint = select.x == CW || select.x == -1 ? target : select;
+// 	*escapeVector = resultVect;
+// }
+int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim){
+	int BS = -50000;
+	vector center = getBiomassCenter(cellGrid, CW, CH, id);
+	*SP = new2Dcoord((int)floorf(center.x), (int)floorf(center.y));
+	for(int x = 0; x<CW; x++){
+		for(int y = 0; y<CH; y++){
+			if(cellGrid[y][x].type == cell_blob && cellGrid[y][x].blob_id == id && cellGrid[y][x].blob_bm >= 100 && getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_empty, 6) > 5){
+				int S = 0;
+				S += cellGrid[y][x].blob_oscillation*5;
+				S += getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_empty, sim.detectionRadius*2)*500;
+				S -= getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_block, sim.detectionRadius*2)*5;
+				S -= getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, sim.detectionRadius*2)*10;
+				S -= getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, sim.detectionRadius*2) > (sim.detectionRadius*1.75) ? 10000 : 0;
+				S -= getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_empty, sim.detectionRadius*2) < (sim.detectionRadius*1.6) ? 10000 : 0;
+				S += getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_food, sim.detectionRadius*2)*1000;
+				S += cellGrid[y][x].blob_type==blob_kernel ? 1000 : 0;
+				S -= sqrt(pow((int)floorf(center.x)-x,2)+pow((int)floorf(center.y)-y,2))*4;
+				if(S > BS || (S == BS && rand()%3 == 0)){
+					BS = S;
+					if(getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_food, sim.detectionRadius) > 0) *SV = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord(x,y), cell_food, sim.detectionRadius);
+					else *SV = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord(x,y), cell_empty, sim.detectionRadius);
+					//else{
+					//	SV->x = 0;
+					//	SV->y = 0;
+					//}
+					*SP = new2Dcoord(x,y);
+				}
+			}
 		}
 	}
-	resultVect = crunchSpeed(resultVect, 1);
-	printf("%f, %f, %f\n",resultVect.x, resultVect.y,atan2f(resultVect.y,resultVect.x));
-	printf("cos : %f sin : %f \n", cosf(M_PI), sinf(M_PI));
-	
-	*escapePoint = select.x == CW || select.x == -1 ? target : select;
-	*escapeVector = resultVect;
+	return BS;
 }
 
 int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius){
-	int SN;
+	int SN = 0;
 	for(int ty = -radius; ty <= radius ; ty++) for(int tx = -radius; tx <= radius; tx++)
 		if((target.x+tx) > 0 && (target.x+tx) < CW && (target.y+ty) > 0 && (target.y+ty) < CH && !(target.x == tx && target.y == ty))
-			if(cellGrid[target.y+ty][target.x+tx].type == type)
+			if(cellGrid[target.y+ty][target.x+tx].type == type){
 				SN++;
+			}
 	return SN;
 }
 vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id){
@@ -226,9 +329,16 @@ coord2D getPeriphPoint(cell **cellGrid, int CW, int CH, int id, vector center, f
 
 
 vector crunchSpeed(vector vect, int speed){
-	float a = speed/(sqrtf(powf(vect.x, 2.0) + powf(vect.y, 2.0)));
-	vect.x *= a;
-	vect.y *= a;
+	if(vect.x != 0 && vect.y != 0){
+		float a = speed/(sqrtf(powf(vect.x, 2.0) + powf(vect.y, 2.0)));
+		vect.x *= a;
+		vect.y *= a;
+	}
+	if(vect.x == 0 && vect.y == 0);
+	else{
+		if(vect.y == 0) vect.x = vect.x > 0 ? 1 : -1;
+		if(vect.x == 0) vect.y = vect.y > 0 ? 1 : -1;
+	}
 	return vect;
 }
 
@@ -261,13 +371,14 @@ blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (iniBlobCells)");
 		exit(EXIT_FAILURE);
 	}
-	cellGrid[SP.y][SP.x] = newBlobCell(cellGrid, cellGrid[SP.y][SP.x].food_amount, blob_kernel, newBLOB.id, -1, 50000, cellGrid[SP.y][SP.x].mucus_amount, SP, -200);
-	if(cellGrid[SP.y][SP.x].type == cell_blob) printf("OK\n");
+	cellGrid[SP.y][SP.x] = newBlobCell(cellGrid, cellGrid[SP.y][SP.x].food_amount, blob_kernel, newBLOB.id, -1, 50000, cellGrid[SP.y][SP.x].mucus_amount, SP, -50);
+	// if(cellGrid[SP.y][SP.x].type == cell_blob) printf("OK\n");
+	newBLOB.Kernel_Start = new2Dcoord(SP.x, SP.y);
 	int n = 1;
 	while(n < (newBLOB.totalCells - 1)){
 		for(int x = 0; x<CW; x++){
 			for(int y = 0; y<CH; y++){
-				if((cellGrid[y][x].type == cell_empty || cellGrid[y][x].type == cell_food) && n < (newBLOB.totalCells - 1) && (rand()%19) == 0){
+				if((cellGrid[y][x].type == cell_empty || cellGrid[y][x].type == cell_food || cellGrid[y][x].type == cell_mucus) && n < (newBLOB.totalCells - 1) && (rand()%19) == 0){
 					int BN = 0;
 					if(y < (CH - 1)) if(cellGrid[y+1][x].type == cell_blob && cellGrid[y+1][x].blob_id == newBLOB.id) BN++;
 					if(y > 1) if(cellGrid[y-1][x].type == cell_blob && cellGrid[y-1][x].blob_id == newBLOB.id) BN++;
@@ -275,7 +386,7 @@ blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 					if(x > 1) if(cellGrid[y][x-1].type == cell_blob && cellGrid[y][x-1].blob_id == newBLOB.id) BN++;
 					//printf("%d, %d\n", BN, n);
 					if(BN > 0){
-						cellGrid[y][x] = newBlobCell(cellGrid, cellGrid[y][x].food_amount, blob_kernel, newBLOB.id, -1, 40000, cellGrid[y][x].mucus_amount, new2Dcoord(x,y), -150);
+						cellGrid[y][x] = newBlobCell(cellGrid, cellGrid[y][x].food_amount, blob_kernel, newBLOB.id, -1, 40000, cellGrid[y][x].mucus_amount, new2Dcoord(x,y), -20);
 						n++;
 					}
 				}
@@ -283,8 +394,10 @@ blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 		}
 	}
     newBLOB.ants = NULL;
+	newBLOB.path = NULL;
     newBLOB.nAnts = 0;
 	newBLOB.isExpanding = true;
+	newBLOB.pathIsSet = false;
 	return newBLOB;
 }
 
