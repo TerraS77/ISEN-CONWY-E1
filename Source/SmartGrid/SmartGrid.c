@@ -146,13 +146,13 @@ void gestionEvenement(EvenementGfx evenement)
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
 						sim.AtracFoodMultiplicator = 1;
-						sim.detectionRadius = 4;
+						sim.detectionRadius = 3;
 						sim.OscilInfluence = 0.3;
 						sim.ramificationRarity = 15;
 						sim.RepMucusMultiplicator = 0.2;
 						sim.RepSelfMultiplicator = 0.7;
 						sim.RepWallMultiplicator = 0.7;
-						sim.AtracEmptyMultiplicator = 0.2;
+						sim.AtracEmptyMultiplicator = 0.5;
 						break;
 					case menu_Env :
 						DataSizeX = 600;
@@ -210,7 +210,7 @@ void gestionEvenement(EvenementGfx evenement)
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
-				demandeTemporisation(5);
+				demandeTemporisation(1);
 			break;
 			
 			case Temporisation: ;
@@ -286,7 +286,7 @@ void gestionEvenement(EvenementGfx evenement)
 						if(addType == 3)
 							for (int y = 0; y < DataSizeY; y++)
 								for (int x = 0; x < DataSizeX; x++)
-									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5)
+									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 5 && CellData[y][x].type == cell_empty)
 										CellData[y][x] = newCell(cell_food, 200, -1, -1);
 					}
 				}
