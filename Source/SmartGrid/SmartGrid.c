@@ -147,27 +147,27 @@ void gestionEvenement(EvenementGfx evenement)
 						mazeEngine(WallGrid, DataSizeX, DataSizeY, LAB_SIZE);
 						sim.AtracFoodMultiplicator = 1;
 						sim.detectionRadius = 3;
-						sim.OscilInfluence = 0.3;
+						sim.OscilInfluence = 0.5;
 						sim.ramificationRarity = 15;
 						sim.RepMucusMultiplicator = 0.2;
-						sim.RepSelfMultiplicator = 0.7;
-						sim.RepWallMultiplicator = 0.7;
-						sim.AtracEmptyMultiplicator = 0.5;
+						sim.RepSelfMultiplicator = 0.4;
+						sim.RepWallMultiplicator = 0.5;
+						sim.AtracEmptyMultiplicator = 0.8;
 						break;
 					case menu_Env :
-						DataSizeX = 600;
-						DataSizeY = 400;
+						DataSizeX = 400;
+						DataSizeY = 350;
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						RockPanel(120, WallGrid, DataSizeX, DataSizeY);
 						sim.AtracFoodMultiplicator = 1;
-						sim.detectionRadius = 6;
-						sim.OscilInfluence = 0.15;
-						sim.ramificationRarity = 20;
+						sim.detectionRadius = 3;
+						sim.OscilInfluence = 0.5;
+						sim.ramificationRarity = 15;
 						sim.RepMucusMultiplicator = 0.2;
 						sim.RepSelfMultiplicator = 0.4;
-						sim.RepWallMultiplicator = 0.7;
-						sim.AtracEmptyMultiplicator = 0.3;
+						sim.RepWallMultiplicator = 0.5;
+						sim.AtracEmptyMultiplicator = 0.8;
 						break;
 					case menu_Void :
 						DataSizeX = 1000;
@@ -175,13 +175,13 @@ void gestionEvenement(EvenementGfx evenement)
 						iniGridData(&WallGrid, DataSizeX, DataSizeY);
 						iniCellData(&CellData, DataSizeX, DataSizeY);
 						sim.AtracFoodMultiplicator = 1;
-						sim.detectionRadius = 4;
-						sim.OscilInfluence = 0.15;
-						sim.ramificationRarity = 20;
-						sim.RepMucusMultiplicator = 0.2;
-						sim.RepSelfMultiplicator = 0.4;
-						sim.RepWallMultiplicator = 0.7;
-						sim.AtracEmptyMultiplicator = 0.3;
+						sim.detectionRadius = 6;
+						sim.OscilInfluence = 0.05;
+						sim.ramificationRarity = 14;
+						sim.RepMucusMultiplicator = 0.7;
+						sim.RepSelfMultiplicator = 0.5;
+						sim.RepWallMultiplicator = 0.5;
+						sim.AtracEmptyMultiplicator = 0.9;
 						break;
 					case menu_Sandbox :
 						DataSizeX = 395;
@@ -194,13 +194,13 @@ void gestionEvenement(EvenementGfx evenement)
 						RockPanel(120, EnvData, DataSizeX, DataSizeY);
 						for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(EnvData[y][x]) WallGrid[y][x] = 0;
 						sim.AtracFoodMultiplicator = 1;
-						sim.detectionRadius = 4;
-						sim.OscilInfluence = 0.15;
-						sim.ramificationRarity = 20;
-						sim.RepMucusMultiplicator = 0.2;
-						sim.RepSelfMultiplicator = 0.4;
-						sim.RepWallMultiplicator = 0.7;
-						sim.AtracEmptyMultiplicator = 0.3;
+						sim.detectionRadius = 3;
+						sim.OscilInfluence = 0.5;
+						sim.ramificationRarity = 15;
+						sim.RepMucusMultiplicator = 0.9;
+						sim.RepSelfMultiplicator = 0.48;
+						sim.RepWallMultiplicator = 0.5;
+						sim.AtracEmptyMultiplicator = 0.8;
 						break;
 				}
 				if(menuOutput != menu_Void) for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
@@ -210,7 +210,7 @@ void gestionEvenement(EvenementGfx evenement)
 				blobs = (blob_blob*) malloc(sizeof(blob_blob));
 				//MENU
 				iniContextMenu(&header, &nTexts, &texts, &nSliders, &sliders, &nButtons, &buttons, &nTexts2, &texts2, &nButtons2, &buttons2, &nSliders2, &sliders2, MenuWidth, sim);
-				demandeTemporisation(1);
+				demandeTemporisation(14);
 			break;
 			
 			case Temporisation: ;
@@ -336,6 +336,11 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								gen = 0;
+								iniCellData(&CellData, DataSizeX, DataSizeY);
+								blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob));
+								blobNumber = 0;
+								for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
 								menuOutput = menu_Main;
 								break;
 						}
@@ -359,6 +364,11 @@ void gestionEvenement(EvenementGfx evenement)
 								menuType = !menuType;
 								break;
 							case menu_Main:
+								gen = 0;
+								iniCellData(&CellData, DataSizeX, DataSizeY);
+								blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob));
+								blobNumber = 0;
+								for(int x = 0; x < DataSizeX; x++) for(int y = 0; y < DataSizeY; y++) if(WallGrid[y][x]) CellData[y][x] = newCell(cell_block, 0, 0, 0);
 								menuOutput = menu_Main;
 								break;
 						}
