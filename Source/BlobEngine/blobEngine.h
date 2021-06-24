@@ -1,3 +1,17 @@
+/* 
+
+    .______    __        ______   .______       _______ .__   __.   _______  __  .__   __.  _______  
+    |   _  \  |  |      /  __  \  |   _  \     |   ____||  \ |  |  /  _____||  | |  \ |  | |   ____| 
+    |  |_)  | |  |     |  |  |  | |  |_)  |    |  |__   |   \|  | |  |  __  |  | |   \|  | |  |__   
+    |   _  <  |  |     |  |  |  | |   _  <     |   __|  |  . `  | |  | |_ | |  | |  . `  | |   __|  
+    |  |_)  | |  `----.|  `--'  | |  |_)  |    |  |____ |  |\   | |  |__| | |  | |  |\   | |  |____ 
+    |______/  |_______| \______/  |______/     |_______||__| \__|  \______| |__| |__| \__| |_______|
+
+	Version 1.0 (24/06/2021) : Optimisation de Blob Engine                                                                 
+*/
+
+
+
 #include "../SmartUI/SmartUI.h"
 typedef enum{cell_empty, cell_block, cell_food, cell_blob, cell_mucus}cellType;
 typedef enum{blob_none, blob_harvest, blob_kernel, blob_vein, blob_plasma}blob_cellType;

@@ -5,6 +5,7 @@
 #include "rock.h"
 #include "../BlobEngine/blobEngine.h"
 
+// Créer des rochers
 void makeRock(int ***tab, int W, int H)
 {
 	srand(time(NULL));
@@ -114,6 +115,7 @@ void makeRock(int ***tab, int W, int H)
 	}
 }
 
+// Créer des trous
 void bakeHole(int ***tab, int W, int H)
 {
 
@@ -236,6 +238,7 @@ void bakeHole(int ***tab, int W, int H)
 	}
 }
 
+// Créer un tableau stockant tout l'environnement généré
 void RockPanel(int nC, int **CellData, int DataSizeX, int DataSizeY)
 {
 
@@ -274,6 +277,7 @@ void RockPanel(int nC, int **CellData, int DataSizeX, int DataSizeY)
 	}
 }
 
+// Détecte les voisins vivants
 int getAliveNeyboors(int **tab, int x, int y, int xmax, int ymax){
 	int AN = 0;
 	for(int ty = -1; ty < 2 ; ty++){

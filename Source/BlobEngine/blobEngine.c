@@ -239,30 +239,7 @@ vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType
 	if(newVect.x != 0 && newVect.y != 0) newVect = crunchSpeed(newVect, 1);
 	return newVect;
 }
-// void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint){
-// 	vector resultVect;
-// 	coord2D out;
-// 	coord2D select;
-// 	select.x = CW;
-// 	select.y = CH;
-// 	float angle = (2*M_PI)/20;
-// 	for(int i = 0; i<21; i++){
-// 		out = getPeriphPoint(cellGrid, CW, CH, id, resultVect, angle*i, angle);
-// 		printf(" out.x = %d out.y = %d\n", out.x, out.y);
-// 		if(sqrtf(pow(target.x - out.x,2) + pow(target.y - out.y,2))<sqrtf(pow(target.x - select.x,2) + pow(target.y - select.y,2)) || out.x==-1){
-// 			resultVect.x = cosf(angle*i);
-// 			resultVect.y = sinf(angle*i);
-// 			select=out;
-// 			printf("%f, %f, %f = %f (%f)\n", angle*i, resultVect.x, resultVect.y, atan2f(resultVect.y, resultVect.x), sqrt(pow(target.x - out.x,2) + pow(target.y - out.y,2)));
-// 		}
-// 	}
-// 	resultVect = crunchSpeed(resultVect, 1);
-// 	printf("%f, %f, %f\n",resultVect.x, resultVect.y,atan2f(resultVect.y,resultVect.x));
-// 	printf("cos : %f sin : %f \n", cosf(M_PI), sinf(M_PI));
-	
-// 	*escapePoint = select.x == CW || select.x == -1 ? target : select;
-// 	*escapeVector = resultVect;
-// }
+
 int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim){
 	int BS = -50000;
 	vector center = getBiomassCenter(cellGrid, CW, CH, id);

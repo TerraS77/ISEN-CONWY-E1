@@ -1,12 +1,14 @@
 /*
 
-.___  ___.  _______ .__   __.  __    __  
-|   \/   | |   ____||  \ |  | |  |  |  | 
-|  \  /  | |  |__   |   \|  | |  |  |  | 
-|  |\/|  | |   __|  |  . `  | |  |  |  | 
-|  |  |  | |  |____ |  |\   | |  `--'  | 
-|__|  |__| |_______||__| \__|  \______/  
-                                         
+    .___  ___.  _______ .__   __.  __    __  
+    |   \/   | |   ____||  \ |  | |  |  |  | 
+    |  \  /  | |  |__   |   \|  | |  |  |  | 
+    |  |\/|  | |   __|  |  . `  | |  |  |  | 
+    |  |  |  | |  |____ |  |\   | |  `--'  | 
+    |__|  |__| |_______||__| \__|  \______/  
+
+    Version 1.1 (24/06/2021) : Refonte du menu principal
+    Version 1.0 (23/06/2021) : Regroupement de tous les menus dans un fichier                         
 */
 
 // Affiche le menu de contrôle du Blob
@@ -15,18 +17,17 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 // Initialise le menu de contrôle du Blob
 void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nSliders, slider **sliders, int *nButtons, button **buttons, int *nTexts2, text **texts2, int *nButtons2, button **buttons2, int *nSliders2, slider **sliders2, int MenuWidth, simulation sim);
 
+// Menu Principal
 void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataSizeY);
-void iniGridData(int ***tab, int W, int H); //Initialise toutes les cellules en cellules mortes
-void iniColors(color ***tab, int W, int H); //Initialise le tableau associé aux couleurs des cellules
-void initRandom(int **tabCell, int W, int H, color **tabCol); //Mets un peu de couleurs dans la matrice
+
+//Initialise toutes les cellules en cellules mortes
+void iniGridData(int ***tab, int W, int H);
+
+//Initialise le tableau associé aux couleurs des cellules
+void iniColors(color ***tab, int W, int H);
 
 void freeGridData(int ***tab, int W, int H); //Libère les données
 void freeColors(color ***tab, int W, int H); //Libère les données
 
-void save(int **tabCell, int W, int H, color **tabCol); //Sauvegarde la matrice dans un fichier .cnw
-void load(int **tabCell, int W, int H, color **tabCol, action Action); //Charge la matrice depuis un fichier .cnw
-
-void loadBMP(int **tabCell, color **tabCol); //Sauvegarde la matrice dans un fichier .bmp
-void saveBMP(int **tabCell, int W, int H, color **tabCol); //Charge la matrice depuis un fichier .bmp
-
+// Libère les pointeurs
 void FreePointer(void **pointer);
