@@ -39,25 +39,25 @@ void mazeEngine(int **tab, int W, int H, int size)
 	if (W % 2 == 0) W = W - 1;
 	if (H % 2 == 0) H = H - 1;
 	int **mazeData = NULL;
-		iniCellData(&mazeData, W, H);
+	iniCellData(&mazeData, W, H);
 	
-		// Init metaData
-		int **metaData;
-		metaData = (int **)malloc(sizeof(int *) * H);
-		for (int i = 0; i < H; i++)
-		{
-			metaData[i] = (int *)malloc(sizeof(int) * W);
-		}
-		setMetaData(metaData, mazeData, W, H);
+	// Init metaData
+	int **metaData;
+	metaData = (int **)malloc(sizeof(int *) * H);
+	for (int i = 0; i < H; i++)
+	{
+		metaData[i] = (int *)malloc(sizeof(int) * W);
+	}
+	setMetaData(metaData, mazeData, W, H);
 
-		// Init setting
-		int case_x = 0, case_y = 0;
-		int delta_x = 0, delta_y = 0;
-		int nb_zone = ((W - 1) * (H - 1)) / 4 - 1;
-		int id1 = 0, id2 = 0;
+	// Init setting
+	int case_x = 0, case_y = 0;
+	int delta_x = 0, delta_y = 0;
+	int nb_zone = ((W - 1) * (H - 1)) / 4 - 1;
+	int id1 = 0, id2 = 0;
 
-		// Create Maze
-		while (nb_zone != 0)
+	// Create Maze
+	while (nb_zone != 0)
 	{
 		// for (int loop = 0; loop < 10000 ; loop++ ){
 		case_x = rand() % (W - 1); // x de la case
@@ -81,7 +81,7 @@ void mazeEngine(int **tab, int W, int H, int size)
 			}
 		}
 	}
-		free(metaData);
+	free(metaData);
 	printMazeData(mazeData, tab, W, H, size);
 }
 

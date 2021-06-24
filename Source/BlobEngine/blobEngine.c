@@ -64,13 +64,13 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 						}
 					}
 					otherAnts = crunchSpeed(otherAnts, 1);
-					printf("mucus X = %f mucus Y = %f\n",mucus.x,mucus.y);
-					printf("wall X = %f wall Y = %f\n",wall.x,wall.y);
-					printf("self X = %f self Y = %f\n",self.x,self.y);
-					printf("food X = %f food Y = %f\n",food.x,food.y);
-					printf("empty X = %f empty Y = %f\n",empty.x,empty.y);
-					printf("oscil X = %f oscil Y = %f\n",oscil.x,oscil.y);
-					printf("otherAnts X = %f otherAnts Y = %f\n",mucus.x,mucus.y);
+					// printf("mucus X = %f mucus Y = %f\n",mucus.x,mucus.y);
+					// printf("wall X = %f wall Y = %f\n",wall.x,wall.y);
+					// printf("self X = %f self Y = %f\n",self.x,self.y);
+					// printf("food X = %f food Y = %f\n",food.x,food.y);
+					// printf("empty X = %f empty Y = %f\n",empty.x,empty.y);
+					// printf("oscil X = %f oscil Y = %f\n",oscil.x,oscil.y);
+					// printf("otherAnts X = %f otherAnts Y = %f\n",mucus.x,mucus.y);
 					target_blob->ants[i].moov.x -= mucus.x*sim.RepMucusMultiplicator + wall.x*sim.RepWallMultiplicator + self.x*sim.RepSelfMultiplicator + otherAnts.x*sim.RepSelfMultiplicator - food.x*sim.AtracFoodMultiplicator - oscil.x*sim.OscilInfluence - empty.x*sim.AtracEmptyMultiplicator;
 					target_blob->ants[i].moov.y -= mucus.y*sim.RepMucusMultiplicator + wall.y*sim.RepWallMultiplicator + self.y*sim.RepSelfMultiplicator + otherAnts.y*sim.RepSelfMultiplicator - food.y*sim.AtracFoodMultiplicator - oscil.y*sim.OscilInfluence - empty.y*sim.AtracEmptyMultiplicator;
 					target_blob->ants[i].moov = crunchSpeed(target_blob->ants[i].moov, 1);
@@ -505,13 +505,13 @@ void vectorGeneratorRand(float *Vx, float *Vy, int speed){
 void iniCellData(cell ***tab, int W, int H){
 	*tab = (cell**) malloc(sizeof(cell*)*H);
 	if(*tab == NULL){
-		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (inicellGrid 1:0)");
+		printf("ERREUR CRITIQUE : Allocation mémoire sans solution (inicellData 1:0)");
 		exit(EXIT_FAILURE);
 	}
 	for(int y = 0; y<H; y++){
 		(*tab)[y] = (cell*) malloc(sizeof(cell)*W);
 		if((*tab)[y] == NULL){
-			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (inicellGrid 2:%d)", y);
+			printf("ERREUR CRITIQUE : Allocation mémoire sans solution (inicellData 2:%d)", y);
 			for(int Y = 0; Y<y; Y++) free((*tab)[Y]);
 			free(*tab);
 			exit(EXIT_FAILURE);
