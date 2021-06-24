@@ -125,7 +125,7 @@ void gestionEvenement(EvenementGfx evenement)
 		FreePointer(&buttons2);
 		FreePointer(&sliders2);
 		FreePointer(&texts2);
-		FreePointer(&blobs);
+		if(blobs != NULL) freeBlobs(&blobs, &blobNumber, DataSizeY);
 		if(CellData != NULL) freeCellData(&CellData, DataSizeX, DataSizeY);
 		if(WallGrid != NULL) freeGridData(&WallGrid, DataSizeX, DataSizeY);
 		evenement = Initialisation;
@@ -271,7 +271,7 @@ void gestionEvenement(EvenementGfx evenement)
 					if(((largeurFenetre() - MenuWidth -70< abscisseSouris()) &&	((hauteurFenetre() - 70)<ordonneeSouris())));
 					else if ((Sx < DataSizeX) && (Sy < DataSizeY) && (abscisseSouris() < largeurFenetre() - (MenuStatus ? MenuWidth : 0)) && (ordonneeSouris() < hauteurFenetre()))
 					if (((Sx) < DataSizeX) && ((Sy) < DataSizeY) && ((Sx) >= 0) && ((Sy) >= 0)){
-						if(addType == 1 && getNeyboors(CellData, DataSizeX, DataSizeY,new2Dcoord(Sx,Sy),cell_block,3)<16 && CellData[Sy][Sx].type != cell_block){
+						if(addType == 1 && getNeyboors(CellData, DataSizeX, DataSizeY,new2Dcoord(Sx,Sy),cell_block,3)<16 && CellData[Sy][Sx].type == cell_empty){
 							blobNumber++;
 							blobs = (blob_blob*) realloc(blobs, sizeof(blob_blob)*blobNumber);
 							blobs[blobNumber-1] = newBlob(CellData, DataSizeX, DataSizeY, new2Dcoord(Sx, Sy), sim);

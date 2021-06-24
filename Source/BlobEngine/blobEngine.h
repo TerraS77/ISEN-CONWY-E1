@@ -61,6 +61,7 @@ typedef struct{
 void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim);
 
 bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end);
+bool IsAllLinker(int **tab,int CW,int CH,coord2D start, coord2D end);
 // void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
 // void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
 int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim);
@@ -72,6 +73,7 @@ vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id);
 vector crunchSpeed(vector vect, int speed);
 vector getOscilatorVect(cell **cellGrid, int CW, int CH, coord2D target, float targetOscillation, int id);
 blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim);
+void freeBlobs(blob_blob **blobs, int *n, int H);
 cell newBlobCell(cell **cellGrid, int food, blob_cellType blob_type, int id, int ttl, int bm, int mucus_amount, coord2D spawn, float oscillation);
 cell newCell(cellType type, int food_amount, int blob_bm, int mucus_amount);
 cell newEmptyCell();

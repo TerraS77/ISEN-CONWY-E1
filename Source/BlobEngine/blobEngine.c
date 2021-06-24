@@ -137,11 +137,12 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					target_blob->path = (int**) malloc(sizeof(int*)*CH);
 					for(int y = 0; y<CH; y++) target_blob->path[y] = (int*) malloc(sizeof(int)*CW);
 					for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++){
-						if(target_blob->path[y][x] = cellGrid[y][x].blob_id == target_blob->id){
+						if(cellGrid[y][x].blob_id == target_blob->id){
 							target_blob->path[y][x] = 1;
 							target_blob->pathSize++;
 						}else target_blob->path[y][x] = 0; 
 					}
+					target_blob->pathSize = (int) floorf(powf(target_blob->pathSize,1.5));
 				}
 				// exit(EXIT_SUCCESS);
 				coord2D minBM = target_blob->Kernel_Start;
@@ -149,13 +150,18 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					if(target_blob->path[y][x] && cellGrid[y][x].blob_bm < cellGrid[minBM.y][minBM.x].blob_bm)
 						minBM = new2Dcoord(x,y);
 				target_blob->path[minBM.y][minBM.x] = 0;
-				if(IsStartAndEndLinked(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End) && cellGrid[minBM.y][minBM.x].blob_type != blob_kernel) cellGrid[minBM.y][minBM.x] = newCell(cell_mucus, 0, 0, cellGrid[minBM.y][minBM.x].blob_bm);
-				else{
+				if(IsStartAndEndLinked(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End) && cellGrid[minBM.y][minBM.x].blob_type != blob_kernel){
+					cellGrid[minBM.y][minBM.x] = newCell(cell_mucus, 0, 0, cellGrid[minBM.y][minBM.x].blob_bm);
+					target_blob->path[minBM.y][minBM.x] = 0; 
+				}else{
 					target_blob->path[minBM.y][minBM.x] = 1;
 					cellGrid[minBM.y][minBM.x].blob_bm *= 1.5;
 				}
-			// target_blob->pathSize--;
-			// if(target_blob->pathSize <= 0) target_blob->pathIsSet = true;
+			target_blob->pathSize--;
+			if(target_blob->pathSize <= 0){
+				target_blob->pathSize = 0;
+				if(IsAllLinker(target_blob->path, CW, CH, target_blob->Kernel_Start, target_blob->Food_End)) target_blob->pathIsSet = true;
+			}
 		}
 	}
 }
@@ -189,10 +195,26 @@ bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end){
 				}
 			}
 		}
+		if(Pathinding[end.y][end.x] == 2) return true;
+		if(Pathinding[end.y][end.x] == 0) return false;
 		// printf("changes = %d\n", change);
 	}while(change != 0);
 	return Pathinding[end.y][end.x] == 2;
 }
+
+bool IsAllLinker(int **tab,int CW,int CH, coord2D start, coord2D end){
+	int **Pathinding;
+	Pathinding = (int**) malloc(sizeof(int*)*CH);
+	for(int y = 0; y<CH; y++) Pathinding[y] = (int*) malloc(sizeof(int)*CW);
+	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) Pathinding[y][x] = tab[y][x];
+	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) if(tab[y][x] && !(y == start.y && x == start.x) && !(y == end.y && x == end.x)){
+		Pathinding[y][x] = 0;
+		if(IsStartAndEndLinked(Pathinding, CW, CH, start, end)) return false;
+		Pathinding[y][x] = 1;
+	}
+	return true;
+}
+
 vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius){
 	vector newVect;
 	newVect.x = 0;
@@ -363,7 +385,6 @@ vector getOscilatorVect(cell **cellGrid, int CW, int CH, coord2D target, float t
 blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 	srand(time(NULL));
 	blob_blob newBLOB;
-    bool isExpanding;
     newBLOB.id = newBlobID();
 	newBLOB.totalCells = 30;
 	newBLOB.cells = (coord2D*) malloc(sizeof(coord2D)*newBLOB.totalCells);
@@ -497,4 +518,15 @@ void freeCellData(cell ***tab, int W, int H){
 	for(int y = 0; y<H; y++) free((*tab)[y]);
 	free(*tab);
 	*tab = NULL;
+}
+
+void freeBlobs(blob_blob **blobs, int *n, int H){
+	for(int i = 0; i < *n; i++){
+		free((*blobs)[i].ants);
+		for(int y = 0; y < H; y++) free((*blobs)[i].path[y]);
+		free((*blobs)[i].path);
+	}
+	free(*blobs);
+	*blobs = NULL;
+	*n = 0;
 }
