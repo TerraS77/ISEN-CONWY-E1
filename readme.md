@@ -77,4 +77,4 @@ Possibilité d'ajouter des Blobs, des Walls et de la Nourriture grâce à la par
 
 ## Génération procédurale
 
-Le labyrinthe et l'environnement sont générés procéduralements à l'aide d'algorithme à évènements discrets.
+Le labyrinthe et l'environnement sont générés procéduralement à l'aide d'algorithme à évènements discrets.
