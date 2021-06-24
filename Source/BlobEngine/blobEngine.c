@@ -13,6 +13,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 	cell **cacheData = NULL;
 	iniCellData(&cacheData, CW,CH);
 	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) cacheData[y][x] = cellGrid[y][x];
+	//Dévellopement si à proximité de nourriture.
 	for(int x = 0; x<CW; x++){
 		for(int y = 0; y<CH; y++){
 			if(cellGrid[y][x].type == cell_food && getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, 1) > 0 && rand()%2 == 0){
@@ -37,6 +38,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 	}
 	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) cellGrid[y][x] = cacheData[y][x];
 	freeCellData(&cacheData,CW,CH);
+	//PHASE DE RECHERCHE
 	if(target_blob->isExpanding){
 		int actAnt = 0;
 		for(int i = 0; i < target_blob->nAnts; i++){
@@ -48,6 +50,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					target_blob->ants[i].t++;
 					target_blob->ants[i].moov.x += (float)((10.00 - (rand()%20))/10.0);
 					target_blob->ants[i].moov.y += (float)((10.00 - (rand()%20))/10.0);
+					//VECTEURS D'INFLUENCE
 					vector mucus = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_mucus, sim.detectionRadius);
 					vector wall = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_block, sim.detectionRadius);
 					vector self = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord((int)floorf(target_blob->ants[i].x),(int)floorf(target_blob->ants[i].y)), cell_blob, sim.detectionRadius);
@@ -64,16 +67,21 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 						}
 					}
 					otherAnts = crunchSpeed(otherAnts, 1);
-					// printf("mucus X = %f mucus Y = %f\n",mucus.x,mucus.y);
-					// printf("wall X = %f wall Y = %f\n",wall.x,wall.y);
-					// printf("self X = %f self Y = %f\n",self.x,self.y);
-					// printf("food X = %f food Y = %f\n",food.x,food.y);
-					// printf("empty X = %f empty Y = %f\n",empty.x,empty.y);
-					// printf("oscil X = %f oscil Y = %f\n",oscil.x,oscil.y);
-					// printf("otherAnts X = %f otherAnts Y = %f\n",mucus.x,mucus.y);
+					/* 
+					//Affichage (debug) des différents vecteurs d'influence
+					printf("mucus X = %f mucus Y = %f\n",mucus.x,mucus.y);
+					printf("wall X = %f wall Y = %f\n",wall.x,wall.y);
+					printf("self X = %f self Y = %f\n",self.x,self.y);
+					printf("food X = %f food Y = %f\n",food.x,food.y);
+					printf("empty X = %f empty Y = %f\n",empty.x,empty.y);
+					printf("oscil X = %f oscil Y = %f\n",oscil.x,oscil.y);
+					printf("otherAnts X = %f otherAnts Y = %f\n",mucus.x,mucus.y); 
+					*/
+					//Application et compression
 					target_blob->ants[i].moov.x -= mucus.x*sim.RepMucusMultiplicator + wall.x*sim.RepWallMultiplicator + self.x*sim.RepSelfMultiplicator + otherAnts.x*sim.RepSelfMultiplicator - food.x*sim.AtracFoodMultiplicator - oscil.x*sim.OscilInfluence - empty.x*sim.AtracEmptyMultiplicator;
 					target_blob->ants[i].moov.y -= mucus.y*sim.RepMucusMultiplicator + wall.y*sim.RepWallMultiplicator + self.y*sim.RepSelfMultiplicator + otherAnts.y*sim.RepSelfMultiplicator - food.y*sim.AtracFoodMultiplicator - oscil.y*sim.OscilInfluence - empty.y*sim.AtracEmptyMultiplicator;
 					target_blob->ants[i].moov = crunchSpeed(target_blob->ants[i].moov, 1);
+					//Traitement de l'overlap
 					float xCache = target_blob->ants[i].x;
 					float yCache = target_blob->ants[i].y;
 					target_blob->ants[i].x += target_blob->ants[i].moov.x;
@@ -105,6 +113,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					fX = (int)floorf(target_blob->ants[i].x);
 					fY = (int)floorf(target_blob->ants[i].y);
 					if(cellGrid[fY][fX].type == cell_blob && target_blob->ants[i].t>50 && target_blob->ants[i].ttl<500) target_blob->ants[i].ttl = 0;
+					//ETUDE DE LA RAMIFICATION
 					else{
 						if(rand()%sim.ramificationRarity == 0){ // && 
 							int iCell = 0;
@@ -127,17 +136,18 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 				}
 			}
 		}
+		//NOUVEL AGENT SI AUCUNS ACTIFS
 		if(actAnt == 0){
 			for(int i = 0; i<1; i++){
 				target_blob->nAnts = 0;
 				coord2D newStart;
 				vector newVect;
 				int score = getBestStartingPoint(cellGrid, CW, CH, target_blob->id, &newVect, &newStart, sim);
-				//printf("x:%d y:%d score:%d\n", newStart.x, newStart.y, score);
 				newAnt(&target_blob->ants, &target_blob->nAnts, new2Dcoord(newStart.x,newStart.y), newVect.x, newVect.y, score/2 + 200 > 400 ? 400 : score/2 + 200, cellGrid[newStart.y][newStart.x].blob_oscillation, target_blob->id, sim.ramificationRarity);
 			}
 		}
 	}else{
+		//SIMPLIFICATION ET RENFORCEMENT
 		if(!target_blob->pathIsSet){
 				if(target_blob->path == NULL){
 					target_blob->path = (int**) malloc(sizeof(int*)*CH);
@@ -150,7 +160,6 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 					}
 					target_blob->pathSize = (int) floorf(powf(target_blob->pathSize,1.5));
 				}
-				// exit(EXIT_SUCCESS);
 				coord2D minBM = target_blob->Kernel_Start;
 				for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) 
 					if(target_blob->path[y][x] && cellGrid[y][x].blob_bm < cellGrid[minBM.y][minBM.x].blob_bm)
@@ -172,14 +181,7 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 	}
 }
 
-// void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob){
-
-// }
-
-// void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob){
-
-// }
-
+//Verification de la liaison entre deux points d'une grille
 bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end){
 	int **Pathinding;
 	Pathinding = (int**) malloc(sizeof(int*)*CH);
@@ -203,11 +205,11 @@ bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end){
 		}
 		if(Pathinding[end.y][end.x] == 2) return true;
 		if(Pathinding[end.y][end.x] == 0) return false;
-		// printf("changes = %d\n", change);
 	}while(change != 0);
 	return Pathinding[end.y][end.x] == 2;
 }
 
+//Test si le chemin est optimmisé
 bool IsAllLinker(int **tab,int CW,int CH, coord2D start, coord2D end){
 	int **Pathinding;
 	Pathinding = (int**) malloc(sizeof(int*)*CH);
@@ -221,6 +223,7 @@ bool IsAllLinker(int **tab,int CW,int CH, coord2D start, coord2D end){
 	return true;
 }
 
+//Vecteur de réaction associé aux voinsins spécifiés
 vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius){
 	vector newVect;
 	newVect.x = 0;
@@ -231,7 +234,6 @@ vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType
 				if(cellGrid[target.y+ty][target.x+tx].type == type){
 					newVect.x += cosf(atan2f(ty, tx))*sqrtf(powf(tx,2)+powf(ty,2));
 					newVect.y += sinf(atan2f(ty, tx))*sqrtf(powf(tx,2)+powf(ty,2));
-					//printf("FOOD : %d, %d\n",target.x+tx,target.y+ty);
 				}
 			}
 		}
@@ -240,6 +242,7 @@ vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType
 	return newVect;
 }
 
+//Choix d'un poinnt de départ et d'un vecteur initial pour l'agent suivant
 int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim){
 	int BS = -50000;
 	vector center = getBiomassCenter(cellGrid, CW, CH, id);
@@ -261,10 +264,6 @@ int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, co
 					BS = S;
 					if(getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_food, sim.detectionRadius) > 0) *SV = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord(x,y), cell_food, sim.detectionRadius);
 					else *SV = getNeyboorsVect(cellGrid, CW, CH, new2Dcoord(x,y), cell_empty, sim.detectionRadius);
-					//else{
-					//	SV->x = 0;
-					//	SV->y = 0;
-					//}
 					*SP = new2Dcoord(x,y);
 				}
 			}
@@ -273,6 +272,7 @@ int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, co
 	return BS;
 }
 
+//Nomnbre de voinsins donnés
 int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius){
 	int SN = 0;
 	for(int ty = -radius; ty <= radius ; ty++) for(int tx = -radius; tx <= radius; tx++)
@@ -282,6 +282,8 @@ int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, 
 			}
 	return SN;
 }
+
+//Centre de biomasse
 vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id){
 	vector center;
 	center.x = 0;
@@ -376,7 +378,6 @@ blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 		exit(EXIT_FAILURE);
 	}
 	cellGrid[SP.y][SP.x] = newBlobCell(cellGrid, cellGrid[SP.y][SP.x].food_amount, blob_kernel, newBLOB.id, -1, 50000, cellGrid[SP.y][SP.x].mucus_amount, SP, -50);
-	// if(cellGrid[SP.y][SP.x].type == cell_blob) printf("OK\n");
 	newBLOB.Kernel_Start = new2Dcoord(SP.x, SP.y);
 	int n = 1;
 	while(n < (newBLOB.totalCells - 1)){
@@ -388,7 +389,6 @@ blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim){
 					if(y > 1) if(cellGrid[y-1][x].type == cell_blob && cellGrid[y-1][x].blob_id == newBLOB.id) BN++;
 					if(x < (CW - 1)) if(cellGrid[y][x+1].type == cell_blob && cellGrid[y][x+1].blob_id == newBLOB.id) BN++;
 					if(x > 1) if(cellGrid[y][x-1].type == cell_blob && cellGrid[y][x-1].blob_id == newBLOB.id) BN++;
-					//printf("%d, %d\n", BN, n);
 					if(BN > 0){
 						cellGrid[y][x] = newBlobCell(cellGrid, cellGrid[y][x].food_amount, blob_kernel, newBLOB.id, -1, 40000, cellGrid[y][x].mucus_amount, new2Dcoord(x,y), -20);
 						n++;

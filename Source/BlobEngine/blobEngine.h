@@ -13,14 +13,18 @@
 
 
 #include "../SmartUI/SmartUI.h"
+
+// Types de cellules
 typedef enum{cell_empty, cell_block, cell_food, cell_blob, cell_mucus}cellType;
 typedef enum{blob_none, blob_harvest, blob_kernel, blob_vein, blob_plasma}blob_cellType;
 
+//Vecteurs
 typedef struct{
     float x;
     float y;
 }vector;
 
+//Cellule
 typedef struct{
     cellType type;
     int food_amount;
@@ -33,6 +37,8 @@ typedef struct{
     color color;
 }cell;
 
+
+//Agents
 typedef struct{
     bool dead;
     vector moov;
@@ -45,6 +51,7 @@ typedef struct{
     int ramR;
 }ant;
 
+//Blob
 typedef struct{
     int id;
     coord2D *cells;
@@ -59,6 +66,7 @@ typedef struct{
     int pathSize;
 }blob_blob;
 
+//Paramètres de la simulation
 typedef struct{
     int ramificationRarity;
     int detectionRadius;
@@ -70,29 +78,42 @@ typedef struct{
     float OscilInfluence;
 }simulation;
 
-//BLOB
 
+//Branche de simulation principale
 void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *BN, simulation sim);
 
+//Tests de simplification
 bool IsStartAndEndLinked(int **tab,int CW,int CH,coord2D start, coord2D end);
 bool IsAllLinker(int **tab,int CW,int CH,coord2D start, coord2D end);
-// void blobFusion(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *mergedBlob);
-// void blobDivision(cell **cellGrid, int CW, int CH, blob_blob *blob_target, blob_blob *newBlob);
+
+//Choix d'un poinnt de départ et d'un vecteur initial pour l'agent suivant
 int getBestStartingPoint(cell **cellGrid, int CW, int CH, int id, vector *SV, coord2D *SP, simulation sim);
-// void getEscapeVector(cell **cellGrid, int CW, int CH, coord2D target, int id, vector *escapeVector, coord2D *escapePoint);
+
+//Vecteur de réaction associé aux voinsins spécifiés
 vector getNeyboorsVect(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
-int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
-vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id);
-// coord2D getPeriphPoint(cell **cellGrid, int CW, int CH, int id, vector center, float targetAngle, float teta);
-vector crunchSpeed(vector vect, int speed);
 vector getOscilatorVect(cell **cellGrid, int CW, int CH, coord2D target, float targetOscillation, int id);
+
+//Nombre de voisins spécifiés
+int getNeyboors(cell **cellGrid, int CW, int CH, coord2D target, cellType type, int radius);
+
+//coordonées en float du centre de biomasse du blob
+vector getBiomassCenter(cell **cellGrid, int CW, int CH, int id);
+
+//Constructeurs et destructeurs
 blob_blob newBlob(cell **cellGrid, int CW, int CH, coord2D SP, simulation sim);
-void freeBlobs(blob_blob **blobs, int *n, int H);
+int newBlobID();
 cell newBlobCell(cell **cellGrid, int food, blob_cellType blob_type, int id, int ttl, int bm, int mucus_amount, coord2D spawn, float oscillation);
+void freeBlobs(blob_blob **blobs, int *n, int H);
 cell newCell(cellType type, int food_amount, int blob_bm, int mucus_amount);
 cell newEmptyCell();
-int newBlobID();
+
+//Création d'un agent
 void newAnt(ant **tab, int *tabSize, coord2D coords, float Vx, float Vy, int ttl, float oscillation, int id, int ramRarety);
+
+//Opérations sur les vecteurs
 void vectorGeneratorRand(float *Vx, float *Vy, int speed);
+vector crunchSpeed(vector vect, int speed);
+
+//Constructeur et destructeur de la grille de cellules
 void iniCellData(cell ***tab, int W, int H);
 void freeCellData(cell ***tab, int W, int H);
