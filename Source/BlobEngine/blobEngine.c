@@ -15,9 +15,9 @@ void blobNewRound(cell **cellGrid, int CW, int CH, blob_blob *target_blob, int *
 	for(int x = 0; x<CW; x++) for(int y = 0; y<CH; y++) cacheData[y][x] = cellGrid[y][x];
 	for(int x = 0; x<CW; x++){
 		for(int y = 0; y<CH; y++){
-			if(cellGrid[y][x].type == cell_food && getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, 1) > 0){
+			if(cellGrid[y][x].type == cell_food && getNeyboors(cellGrid, CW, CH, new2Dcoord(x,y), cell_blob, 1) > 0 && rand()%2 == 0){
 				cacheData[y][x].type = cell_blob;
-				cacheData[y][x].blob_bm = 150;
+				cacheData[y][x].blob_bm = 150 + rand()%100;
 				cacheData[y][x].blob_id = target_blob->id;
 				target_blob->isExpanding = false;
 			}
