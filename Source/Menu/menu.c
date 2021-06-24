@@ -11,16 +11,6 @@
 #define MM_H 500
 #define MM_W 1000
 
-/*
-.___  ___.  _______ .__   __.  __    __  
-|   \/   | |   ____||  \ |  | |  |  |  | 
-|  \  /  | |  |__   |   \|  | |  |  |  | 
-|  |\/|  | |   __|  |  . `  | |  |  |  | 
-|  |  |  | |  |____ |  |\   | |  `--'  | 
-|__|  |__| |_______||__| \__|  \______/                                 
-*/
-
-
 // Initialise le menu de contrôle du Blob
 void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nSliders, slider **sliders, int *nButtons, button **buttons, int *nTexts2, text **texts2, int *nButtons2, button **buttons2, int *nSliders2, slider **sliders2, int MenuWidth, simulation sim)
 {
@@ -236,6 +226,7 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 
 }
 
+// Menu Principal
 void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataSizeY)
 {
 	//Matrice de données
@@ -524,7 +515,7 @@ void mainMenu(EvenementGfx evenement, action *Action, int *DataSizeX, int *DataS
 	}
 }
 
-//Allocation dynamique et initialisation à 0 de la matrice
+//Initialise toutes les cellules en cellules mortes
 void iniGridData(int ***tab, int W, int H){
 	*tab = (int**) malloc(sizeof(int*)*H);
 	if(*tab == NULL){
@@ -550,13 +541,14 @@ void freeGridData(int ***tab, int W, int H){
 	*tab = NULL;
 }
 
+//Libération de la mémoire
 void freeColors(color ***tab, int W, int H){
 	for(int y = 0; y<H; y++) free((*tab)[y]);
 	free(*tab);
 	*tab = NULL;
 }
 
-//Allocation dynamique et initialisation à 0 de la matrice
+//Initialise le tableau associé aux couleurs des cellules
 void iniColors(color ***tab, int W, int H){
 	*tab = (color**) malloc(sizeof(color*)*H);
 	if(*tab == NULL){
@@ -575,150 +567,7 @@ void iniColors(color ***tab, int W, int H){
 	for(int x = 0; x<W; x++) for(int y = 0; y<H; y++) (*tab)[y][x] = newColor(0, 0, 0);
 }
 
-void save(int **tabCell, int W, int H, color **tabCol){
-	FILE* fic = NULL;
-	char name[20];
-    char source[40] = "./#Ressources/";
-
-	system("clear");
-	system("ls ./#Ressources/*.cnw --format=single-column | cut -c 15- ");
-    printf("SAVE CNW - Nom de votre fichier : ");
-    scanf("%s", name);
-    strcat(source,name);
-    strcat(source,".cnw");
-	fic = fopen(source, "w");
-
-	for (int i = 0; i < H; i++){
-		for (int j = 0; j < W; j++){
-			if(tabCell[i][j] == 1){
-				fprintf(fic, "{%d;%d}%d/%d/%d;\n", i, j, tabCol[i][j].R, tabCol[i][j].G, tabCol[i][j].B);
-			}
-		}
-	}
-
-	fclose(fic);
-	printf("Le fichier %s a ete enregistre ! \n", name);
-}
-
-//Ouvre la sauvegarde de la matrice
-void load(int **tabCell, int W, int H, color **tabCol, action Action){
-	FILE* fic = NULL;
-	char name[20];
-    char source[40] = "./#Ressources/";
-	int i_temp = 0;
-	int j_temp = 0;
-	int R = 0;
-	int V = 0;
-	int B = 0;
-
-	if(Action == 2){
-		system("clear");
-		system("ls ./#Ressources/*.cnw --format=single-column | cut -c 15- ");
-		
-		printf("LOAD CNW - Nom de votre fichier : ");
-		scanf("%s", name);
-		strcat(source, name);
-	}
-	else strcat(source, "baptiste");
-
-	strcat(source,".cnw");
-	fic = fopen(source, "r");
-
-    const size_t line_size = 300;
-    char* line = malloc(line_size);
-    while (fgets(line, line_size, fic) != NULL) {
-        sscanf(line, "{%d;%d}%d/%d/%d;\n", &i_temp, &j_temp, &R, &V, &B);
-		tabCol[i_temp][j_temp].R = R;
-		tabCol[i_temp][j_temp].G = V;
-		tabCol[i_temp][j_temp].B = B;
-		tabCell[i_temp][j_temp] = 1;
-    }
-
-	free(line);
-	fclose(fic);
-	if(Action == 2) printf("Le fichier %s a ete charge ! \n", name);
-}
-
-//Initialise en mode Random
-void initRandom(int **tabCell, int W, int H, color **tabCol){
-	srand(time(NULL));
-	int r = rand();
-	for(int x = 0; x<W; x++) {
-		for(int y = 0; y<H; y++) {
-			r = rand() % 2;
-			if (r == 1) {
-				tabCell[y][x] = 1;
-				tabCol[y][x].R = rand() % 255;
-				tabCol[y][x].G = rand() % 255;
-				tabCol[y][x].B = rand() % 255;
-				//printf("Etat : %d\tCouleur : %d/%d/%d\n", tabCell[y][x], tabCol[y][x].R, tabCol[y][x].G, tabCol[y][x].B);
-			}
-		}
-	}
-}
-
-void loadBMP(int **tabCell, color **tabCol){
-	char name[20];
-    char source[40] = "./#Ressources/";
-
-	system("clear");
-	system("ls ./#Ressources/*.bmp --format=single-column | cut -c 15- ");
-    printf("LOAD BMP - Nom de votre fichier : ");
-    scanf("%s", name);
-    strcat(name, ".bmp");
-    strcat(source, name);
-
-	DonneesImageRGB *image = NULL;
-	image = lisBMPRGB(source);
-
-    for(int i=0;i<image->hauteurImage;i++){
-        for(int j=0;j<image->largeurImage;j++){
-			tabCol[i][j].R = image->donneesRGB[(j+i*image->hauteurImage)*3+2];
-			tabCol[i][j].G = image->donneesRGB[(j+i*image->hauteurImage)*3+1];
-			tabCol[i][j].B = image->donneesRGB[(j+i*image->hauteurImage)*3];
-			tabCell[i][j] = 1;
-        }
-    }
-	libereDonneesImageRGB(&image);
-	printf("Le fichier %s a ete charge ! \n", name);
-}
-
-void saveBMP(int **tabCell, int W, int H, color **tabCol){
-	char name[20];
-    char source[40] = "./#Ressources/";
-
-	system("clear");
-	system("ls ./#Ressources/*.bmp --format=single-column | cut -c 15- ");
-    printf("SAVE BMP - Nom de votre fichier : ");
-    scanf("%s", name);
-    strcat(name, ".bmp");
-    strcat(source, name);
-
-	
-	DonneesImageRGB *image = NULL;
-	image = lisBMPRGB("./#Ressources/matrice.bmp");
-
-	H = image->hauteurImage;
-	W = image->largeurImage;
-
-	for (int i = 0; i < H; i++){
-		for (int j = 0; j < W; j++){
-			if(tabCell[i][j] == 1){
-				image->donneesRGB[(j+i*image->hauteurImage)*3+2] = tabCol[i][j].R;
-				image->donneesRGB[(j+i*image->hauteurImage)*3+1] = tabCol[i][j].G;
-				image->donneesRGB[(j+i*image->hauteurImage)*3] = tabCol[i][j].B;
-			}
-			else {
-				image->donneesRGB[(j+i*image->hauteurImage)*3+2] = 0;
-				image->donneesRGB[(j+i*image->hauteurImage)*3+1] = 0;
-				image->donneesRGB[(j+i*image->hauteurImage)*3] = 0;
-			}
-		}
-	}
-	libereDonneesImageRGB(&image);
-	printf("Le fichier %s a ete enregistre ! \n", name);
-}
-
+// Libère les pointeurs
 void FreePointer(void **pointer) 
 {
 	if(*pointer != NULL){
