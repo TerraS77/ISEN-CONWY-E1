@@ -300,7 +300,7 @@ void gestionEvenement(EvenementGfx evenement)
 					NeedScrollUpdate = true;
 				}
 				if (etatBoutonSouris() == ScrollDown && CellSize > 3 && !RCD){
-					if(CellSize * 0,6 < 3){
+					if(CellSize * 0,6 <= 3){
 						CellSize = 3;
 						CellInBetween = 0;
 					}
