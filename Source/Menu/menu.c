@@ -34,7 +34,7 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 
 	// Menu "SETTINGS"
 	//TXT
-	*nTexts = 13;
+	*nTexts = 14;
 	*texts = (text *)malloc(sizeof(text) * (*nTexts));
 	(*texts)[0] = newText(RGBwhite, RGBwhite, RGBwhite, 45, Origin, "BLOB", 4);
 	(*texts)[1] = newText(RGBwhite, RGBwhite, RGBwhite, 30, Origin, "ENGINE", 2);
@@ -43,15 +43,16 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 	(*texts)[4] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "X:", 2);
 	(*texts)[5] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "Y:", 2);
 	//TXT Slider
-	(*texts)[6] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S1 :", 2);
-	(*texts)[7] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S2 :", 2);
-	(*texts)[8] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S2 :", 2);
-	(*texts)[9] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S2 :", 2);
-	(*texts)[10] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S2 :", 2);
-	(*texts)[11] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S2 :", 2);
-	(*texts)[12] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "S7 :", 2);
+	(*texts)[6] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[7] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[8] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[9] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[10] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[11] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[12] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
+	(*texts)[13] = newText(RGBwhite, RGBwhite, RGBwhite, 20, Origin, "", 2);
 	//SLIDER
-	*nSliders = 7;
+	*nSliders = 8;
 	*sliders = (slider *)malloc(sizeof(slider) * (*nSliders));
 	(*sliders)[0] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 325), 200, 0, 200, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed, false);
 	(*sliders)[0].value = sim.ramificationRarity;
@@ -67,12 +68,14 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 	(*sliders)[5].value = (*sliders)[5].max * sim.RepWallMultiplicator;
 	(*sliders)[6] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 775), 200, 0, 200, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed, false);
 	(*sliders)[6].value = (*sliders)[6].max * sim.RepSelfMultiplicator;
+	(*sliders)[7] = newSlider(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 850), 200, 0, 200, 1, RGBIdle, RGBHover, RGBClick, UpdateSpeed, false);
+	(*sliders)[7].value = (*sliders)[7].max * sim.AtracEmptyMultiplicator;
 	//BUTTONS
 	*nButtons = 4;
 	*buttons = (button *)malloc(sizeof(button) * (*nButtons));
 	(*buttons)[2] = newButton(new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45), 45, 50, newColor(15, 15, 15), newColor(15, 15, 15), newColor(15, 15, 15), newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "", 2), MENU, false, false);
-	(*buttons)[0] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 118), 100, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Simuler", 2), ChangeMenu, false, false);
-	(*buttons)[1] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 118), 100, 50, RGBClick, RGBClick, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Settings", 2), none, false, false);
+	(*buttons)[0] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 118), 105, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Simulate", 2), ChangeMenu, false, false);
+	(*buttons)[1] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 118), 105, 50, RGBClick, RGBClick, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Settings", 2), none, false, false);
 	(*buttons)[3] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 43, hauteurFenetre() - 123), 45, 50, newColor(28, 28, 28), newColor(28, 28, 28), newColor(28, 28, 28), newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "", 2), menu_Main, false, false);
 
 	// Menu "SIMULER"
@@ -83,8 +86,8 @@ void iniContextMenu(DonneesImageRGB **header, int *nTexts, text **texts, int *nS
 	(*buttons2)[1] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 90, hauteurFenetre() - 650), 100, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Pause", 2), TogglePause, true, true);
 	(*buttons2)[2] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 650), 100, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Reset", 2), RESET, false, false);
 	(*buttons2)[3] = newButton(new2Dcoord(largeurFenetre() - MenuWidth - 50, hauteurFenetre() - 45), 45, 50, newColor(15, 15, 15), newColor(15, 15, 15), newColor(15, 15, 15), newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "", 2), MENU, false, false);
-	(*buttons2)[4] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 90, hauteurFenetre() - 118), 100, 50, RGBClick, RGBClick, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Simuler", 2), none, false, false);
-	(*buttons2)[5] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 118), 100, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Settings", 2), ChangeMenu, false, false);
+	(*buttons2)[4] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 90, hauteurFenetre() - 118), 105, 50, RGBClick, RGBClick, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Simulate", 2), none, false, false);
+	(*buttons2)[5] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 200, hauteurFenetre() - 118), 105, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "Settings", 2), ChangeMenu, false, false);
 	(*buttons2)[6] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 300), 80, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "B", 2), addType1, true, false);
 	(*buttons2)[7] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 375), 80, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "W", 2), addType2, true, false);
 	(*buttons2)[8] = newButton(new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 450), 80, 50, RGBIdle, RGBHover, RGBClick, newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 25, new2Dcoord(0, 0), "F", 2), addType3, true, false);
@@ -115,13 +118,12 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 		rectangle(largeurFenetre() - MenuWidth, hauteurFenetre(), largeurFenetre(), 0);
 
 		// Cellules vivantes
-		vivant = 0;
 		char string[64];
-		sprintf(string, "Cellules: %d", vivant);
+		sprintf(string, "Cells : %d", vivant);
 		texts[2] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 180), string, 2);
 		// Génération
 		char string2[64];
-		sprintf(string2, "Generation: %d", gen);
+		sprintf(string2, "Generation : %d", gen);
 		texts[3] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 210), string2, 2);
 		// X
 		char string3[25];
@@ -133,43 +135,47 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 		texts[5] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 240), string4, 2);
 		// Vitesse
 		char string5[25];
-		sprintf(string5, "Vitesse : %.2f", (float)(((float)sliders2->value / 100)));
+		sprintf(string5, "Speed : %.2f", (float)(((float)sliders2->value / 100)));
 		texts2[2] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 200), string5, 2);
 		// ramificationRarity
 		char string8[25];
 		sim->ramificationRarity = sliders[0].value + 5;
-		sprintf(string8, "ramRarity : %d", sim->ramificationRarity);
+		sprintf(string8, "Rarity Division : %d", sim->ramificationRarity);
 		texts[6] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 280), string8, 2);
 		// detectionRadius
 		char string7[25];
 		sim->detectionRadius = sliders[1].value;
-		sprintf(string7, "detectionRadius : %d", sim->detectionRadius);
+		sprintf(string7, "Detection Radius : %d", sim->detectionRadius);
 		texts[7] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 355), string7, 2);
 		// Oscillation
 		char string12[25];
 		sim->OscilInfluence = (float)sliders[2].value / (float)sliders[2].max;
-		sprintf(string12, "OscillationInf : %.2f", sim->OscilInfluence);
+		sprintf(string12, "Oscil. Influence : %.2f", sim->OscilInfluence);
 		texts[8] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 430), string12, 2);
 		// AtracFood
 		char string6[25];
 		sim->AtracFoodMultiplicator = (float)sliders[3].value / (float)sliders[3].max;
-		sprintf(string6, "attracFood : %.2f", sim->AtracFoodMultiplicator);
+		sprintf(string6, "Food Attraction : %.2f", sim->AtracFoodMultiplicator);
 		texts[9] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 505), string6, 2);
 		// RepMucus
 		char string9[25];
 		sim->RepMucusMultiplicator = (float)sliders[4].value / (float)sliders[4].max;
-		sprintf(string9, "RepMucus : %.2f", sim->RepMucusMultiplicator);
+		sprintf(string9, "Mucus Repulsion : %.2f", sim->RepMucusMultiplicator);
 		texts[10] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 580), string9, 2);
 		// RepWall
 		char string10[25];
 		sim->RepWallMultiplicator = (float)sliders[5].value / (float)sliders[5].max;
-		sprintf(string10, "RepWall : %.2f", sim->RepWallMultiplicator);
+		sprintf(string10, "Wall Repulsion : %.2f", sim->RepWallMultiplicator);
 		texts[11] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 655), string10, 2);
 		// RepSelf
 		char string11[25];
 		sim->RepSelfMultiplicator = (float)sliders[6].value / (float)sliders[6].max;
-		sprintf(string11, "RepSelf : %.2f", sim->RepSelfMultiplicator);
+		sprintf(string11, "Self Repulsion : %.2f", sim->RepSelfMultiplicator);
 		texts[12] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 730), string11, 2);
+		char string13[25];
+		sim->AtracEmptyMultiplicator = (float)sliders[7].value / (float)sliders[7].max;
+		sprintf(string12, "Void Attraction : %.2f", sim->AtracEmptyMultiplicator);
+		texts[13] = newText(newColor(255, 255, 255), newColor(255, 255, 255), newColor(255, 255, 255), 20, new2Dcoord(largeurFenetre() - MenuWidth + 30, hauteurFenetre() - 805), string12, 2);
 
 		// Menu "SETTINGS"
 		whenHoverUI(buttons, nButtons, sliders, nSliders, new2Dcoord(abscisseSouris(), ordonneeSouris()));
@@ -182,6 +188,7 @@ void printContextMenu(button *buttons, slider *sliders, text *texts, button *but
 		updateSlider(&sliders[4], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 605));	 // RepMucus
 		updateSlider(&sliders[5], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 680));	 // RepWall
 		updateSlider(&sliders[6], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 755));	 // RepSelf
+		updateSlider(&sliders[7], new2Dcoord(largeurFenetre() - MenuWidth + 150, hauteurFenetre() - 830));	 // AttracEmpty
 		updateButton(&buttons[0], (new2Dcoord(largeurFenetre() - MenuWidth + 120, hauteurFenetre() - 118))); // Menu 1
 		updateButton(&buttons[1], (new2Dcoord(largeurFenetre() - MenuWidth + 230, hauteurFenetre() - 118))); // Menu 2
 		updateButton(&buttons[2], (new2Dcoord(largeurFenetre() - MenuWidth + 33, hauteurFenetre() - 123)));  // Return to menu

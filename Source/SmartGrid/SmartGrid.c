@@ -217,6 +217,11 @@ void gestionEvenement(EvenementGfx evenement)
 				//Update cell capacity
 				HcellCap = (hauteurFenetre() - CellInBetween) / (CellSize + CellInBetween);
 				WcellCap = (largeurFenetre() - CellInBetween - (MenuStatus ? MenuWidth : 0)) / (CellSize + CellInBetween);
+				if(addType == 2 && etatBoutonSouris() == GaucheAppuye)
+							for (int y = 0; y < DataSizeY; y++)
+								for (int x = 0; x < DataSizeX; x++)
+									if(sqrt(pow(Sx - x, 2)+pow(Sy - y, 2)) < 3)
+										CellData[y][x] = newCell(cell_block, 0, -1, -1);
 
 				//>>>Gestion de la simulation et APPEL<<<
 				//==========================================================================================================================
@@ -234,6 +239,8 @@ void gestionEvenement(EvenementGfx evenement)
 				//Menu
 				if(MenuStatus==true && MenuWidth<290) MenuWidth+=50;
 				else if (MenuStatus==false && MenuWidth>0) MenuWidth-=50;
+				vivant = 0;
+				for(int x = 0; x < DataSizeX; x++) for(int y = 0; y <DataSizeY; y++) if(CellData[y][x].type == cell_blob) vivant++;
 				rafraichisFenetre();
 				break;
 			
