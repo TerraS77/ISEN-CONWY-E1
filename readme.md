@@ -8,13 +8,13 @@
      \|_______|\|_______|\|_______|\|_______|        \|_______|\|__| \|__|\|_______|\|__|\|__| \|__|\|_______|
 ```
 
-
 # ARCHITECTURE
+![Archi app](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/e7490f81-9290-4660-800e-6bfce160aa13)
 
 Our modular architecture allows for a set of organized files. Our makefile is itself framed by a bash script run.sh which transforms the source files in the source folder into objects that are then compiled into the Build executable. 
 
 ## Blob Engine
-
+![Blob Routine](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/15e23f46-cf17-4043-9b81-4f4a59235b5d)
 This library contains the source file and the header file of the Blob prototype. In these files are the different characteristics of the bob and what it can do.
 
 ## Procedural 
@@ -46,6 +46,13 @@ This library contains the main menu and the secondary contextual menu for the si
 - Environment Simulation: A Blob is placed in a procedurally generated environment where it will have to find food to survive.
 - Empty Simulation: A Blob is placed in an empty space to see its evolution without any obstacles.
 - Custom Simulation: A Blob is placed in an environment that can be modified according to our desires.
+
+| Maze | Environment | Empty | Custom |
+| --------------- | --------------- | --------------- | --------------- |
+| ![maze](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/2c935851-1ba0-4a04-8987-b1ae7e13f956) | ![env](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/81a06445-4061-4936-add8-901c09fd782e) | ![void](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/7ed6727e-c000-413e-a0a8-cbdaa8e2c8b5) | ![custom](https://github.com/tom-bourjala/ISEN-ALG-BLOB/assets/31037693/d2ff30a1-1cc3-4f40-88af-45c07324d83c) |
+
+
+
 
 ## Navigation and Control
 
